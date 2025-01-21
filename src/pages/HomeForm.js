@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Home = () => {
+const HomeForm = () => {
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>알쓰에 오신걸 환영합니다.</h1>
@@ -51,4 +51,4 @@ const styles = {
   },
 };
 
-export default Home;
+export default HomeForm;

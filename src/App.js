@@ -1,13 +1,15 @@
-import { Route, Router, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
-import Home from './pages/Home';
+import HomeForm from './pages/HomeForm';
+import JoinForm from './pages/auth/JoinForm';
 
 function App() {
   return (
     <div>
       <Header />
       <Routes>
-        <Route path="/" element={<Home />}></Route>
+        <Route path="/" element={<HomeForm />}></Route>
+        <Route path="/join" element={<JoinForm />}></Route>
       </Routes>
     </div>
   );
