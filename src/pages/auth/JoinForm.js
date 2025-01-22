@@ -21,7 +21,9 @@ const JoinForm = () => {
         alert('회원가입 성공');
         navigate('/login', { replace: true });
       } else {
-        alert('회원가입 실패');
+        const errorData = await response.json();
+        console.log(errorData); // 서버에서 반환한 오류 메시지
+        alert(`회원가입 실패: ${errorData.message || '알 수 없는 오류 발생'}`); // 오류 메시지 출력
       }
     } catch (error) {
       console.log('Error: ', error);

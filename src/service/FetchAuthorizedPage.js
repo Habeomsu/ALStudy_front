@@ -21,7 +21,7 @@ const FetchAuthorizedPage = async (url, navigate, location) => {
         FetchAuthorizedPage(url, navigate, location);
       } else {
         // useLocation 으로 얻은 path 를 useNavigate 을 사용해 state 에 set
-        alert('관리자가 아닙니다.');
+        alert('로그인 해주세요');
         navigate('/login', { state: location.pathname });
       }
     }

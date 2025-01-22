@@ -38,7 +38,9 @@ const LoginForm = () => {
         // 로그인 완료 후, 이전 요청이 존재하면 이전 요청으로 이동
         navigate(prevUrl, { replace: true });
       } else {
-        alert('Login failed');
+        // 오류 응답 처리
+        const errorData = await response.json();
+        alert(`로그인 실패: ${errorData.message || '로그인 실패'}`);
       }
     } catch (error) {
       console.log('error: ', error);
