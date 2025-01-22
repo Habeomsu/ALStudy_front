@@ -1,7 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
+import { useLogin } from '../contexts/AuthContext';
 
 const HomeForm = () => {
+  const { isLoggedIn, loginUser } = useLogin();
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>알쓰에 오신걸 환영합니다.</h1>
