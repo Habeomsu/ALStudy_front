@@ -5,52 +5,59 @@ import { useLogin } from '../contexts/AuthContext';
 import LogoutForm from '../pages/auth/LogoutForm';
 
 const Header = () => {
-  const { isLoggedIn, role } = useLogin();
+  const { isLoggedIn, role, loginUser } = useLogin();
   return (
-    <>
-      <Navbar bg="dark" data-bs-theme="dark">
-        <Container>
-          <Link to="/" className="navbar-brand">
-            AlgorithmStudy
-          </Link>
-          <Nav className="ms-auto">
-            {isLoggedIn && (
-              <>
-                <Link to="/problem" className="nav-link">
-                  문제
-                </Link>
-                {role === 'ROLE_USER' && (
-                  <>
-                    <Link to="/groups" className="nav-link">
-                      그룹
-                    </Link>
-                    <Link to="/usergroups" className="nav-link">
-                      내 그룹
-                    </Link>
-                  </>
-                )}
-                {role === 'ROLE_ADMIN' && (
-                  <Link to="/create-problem" className="nav-link">
-                    문제 생성
-                  </Link>
-                )}
-                <LogoutForm /> {/* 로그아웃 버튼 */}
-              </>
-            )}
-            {!isLoggedIn && (
-              <>
-                <Link to="/join" className="nav-link">
-                  회원가입
-                </Link>
-                <Link to="/login" className="nav-link">
-                  로그인
-                </Link>
-              </>
-            )}
-          </Nav>
-        </Container>
-      </Navbar>
-    </>
+    <Navbar bg="dark" variant="dark">
+      <Container>
+        <Link to="/" className="navbar-brand">
+          AlgorithmStudy
+        </Link>
+        <Nav className="me-auto">
+          {isLoggedIn && (
+            <>
+              <Nav.Link as={Link} to="/problems">
+                문제
+              </Nav.Link>
+              {role === 'ROLE_USER' && (
+                <>
+                  <Nav.Link as={Link} to="/groups">
+                    그룹
+                  </Nav.Link>
+                  <Nav.Link as={Link} to="/usergroups">
+                    내 그룹
+                  </Nav.Link>
+                </>
+              )}
+              {role === 'ROLE_ADMIN' && (
+                <Nav.Link as={Link} to="/create-problem">
+                  문제 생성
+                </Nav.Link>
+              )}
+            </>
+          )}
+        </Nav>
+        <Nav>
+          {isLoggedIn && (
+            <span className="navbar-text me-2">
+              {loginUser || '사용자'}
+              {role === 'ROLE_ADMIN' ? ' (관리자)' : ''}님
+            </span>
+          )}
+          {isLoggedIn ? (
+            <LogoutForm /> // 로그아웃 버튼
+          ) : (
+            <>
+              <Nav.Link as={Link} to="/join">
+                회원가입
+              </Nav.Link>
+              <Nav.Link as={Link} to="/login">
+                로그인
+              </Nav.Link>
+            </>
+          )}
+        </Nav>
+      </Container>
+    </Navbar>
   );
 };
 
