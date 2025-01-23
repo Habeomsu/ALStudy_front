@@ -3,8 +3,9 @@ import { useLogin } from '../contexts/AuthContext';
 import JoinForm from '../pages/auth/JoinForm';
 import LoginForm from '../pages/auth/LoginForm';
 import HomeForm from '../pages/HomeForm';
-import LogoutForm from '../pages/auth/LogoutForm';
+
 import ProblemsForm from '../pages/problem/ProblemsForm';
+import ProblemsDetailForm from '../pages/problem/ProblemsDetailForm';
 const MyRoutes = () => {
   const { isLoggedIn, role } = useLogin();
   // 로그인 여부에 따라서 조건부 라우팅
@@ -14,6 +15,9 @@ const MyRoutes = () => {
       {!isLoggedIn && <Route path="/login" element={<LoginForm />} />}
       {!isLoggedIn && <Route path="/join" element={<JoinForm />} />}
       {isLoggedIn && <Route path="/problems" element={<ProblemsForm />} />}
+      {isLoggedIn && (
+        <Route path="/problems/:problemId" element={<ProblemsDetailForm />} />
+      )}
     </Routes>
   );
 };
