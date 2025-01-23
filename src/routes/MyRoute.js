@@ -5,7 +5,7 @@ import LoginForm from '../pages/auth/LoginForm';
 import HomeForm from '../pages/HomeForm';
 import LogoutForm from '../pages/auth/LogoutForm';
 const MyRoutes = () => {
-  const { isLoggedIn } = useLogin();
+  const { isLoggedIn, role } = useLogin();
   // 로그인 여부에 따라서 조건부 라우팅
   return (
     <Routes>

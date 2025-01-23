@@ -11,10 +11,18 @@ const AuthProvider = ({ children }) => {
   const [loginUser, setLoginUser] = useState(
     window.localStorage.getItem('name')
   );
+  const [role, setRole] = useState(window.localStorage.getItem('role'));
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, setIsLoggedIn, loginUser, setLoginUser }}
+      value={{
+        isLoggedIn,
+        setIsLoggedIn,
+        loginUser,
+        setLoginUser,
+        role,
+        setRole,
+      }}
     >
       {children}
     </AuthContext.Provider>

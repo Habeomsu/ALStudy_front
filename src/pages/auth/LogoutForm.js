@@ -17,6 +17,7 @@ const LogoutForm = () => {
         alert('로그아웃 성공! 안녕히 가세요.');
         window.localStorage.removeItem('access');
         window.localStorage.removeItem('name');
+        window.localStorage.removeItem('role');
 
         setIsLoggedIn(false);
         setLoginUser(null);

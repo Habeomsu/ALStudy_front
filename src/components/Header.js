@@ -5,7 +5,7 @@ import { useLogin } from '../contexts/AuthContext';
 import LogoutForm from '../pages/auth/LogoutForm';
 
 const Header = () => {
-  const { isLoggedIn } = useLogin();
+  const { isLoggedIn, role } = useLogin();
   return (
     <>
       <Navbar bg="dark" data-bs-theme="dark">
@@ -19,9 +19,21 @@ const Header = () => {
                 <Link to="/problem" className="nav-link">
                   문제
                 </Link>
-                <Link to="/groups" className="nav-link">
-                  그룹
-                </Link>
+                {role === 'ROLE_USER' && (
+                  <>
+                    <Link to="/groups" className="nav-link">
+                      그룹
+                    </Link>
+                    <Link to="/usergroups" className="nav-link">
+                      내 그룹
+                    </Link>
+                  </>
+                )}
+                {role === 'ROLE_ADMIN' && (
+                  <Link to="/create-problem" className="nav-link">
+                    문제 생성
+                  </Link>
+                )}
                 <LogoutForm /> {/* 로그아웃 버튼 */}
               </>
             )}

@@ -24,13 +24,14 @@ const LoginForm = () => {
       });
 
       if (response.ok) {
-        alert('Login successful');
+        alert('로그인 성공');
 
         const data = await response.json();
         const { result } = data;
 
         window.localStorage.setItem('access', response.headers.get('access'));
-        window.localStorage.setItem('name', result);
+        window.localStorage.setItem('name', result.username);
+        window.localStorage.setItem('role', result.role);
 
         setIsLoggedIn(true);
         setLoginUser(result);

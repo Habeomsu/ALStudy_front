@@ -2,10 +2,11 @@ import React from 'react';
 import { useLogin } from '../contexts/AuthContext';
 
 const HomeForm = () => {
-  const { isLoggedIn, loginUser } = useLogin();
+  const { isLoggedIn, loginUser, role } = useLogin();
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>알쓰에 오신걸 환영합니다.</h1>
+
       <h2>알쓰의 장점</h2>
       <ol style={styles.list}>
         <li>다른 그룹원의 알고리즘 코드를 확인 가능하다.</li>
