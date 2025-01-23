@@ -7,6 +7,7 @@ import {
   ProblemItem,
   ProblemList,
 } from '../../style/problem';
+import { useLogin } from '../../contexts/AuthContext';
 
 const ProblemsForm = () => {
   const [problems, setProblems] = useState([]);
@@ -17,6 +18,8 @@ const ProblemsForm = () => {
   const [totalElements, setTotalElements] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { role } = useLogin();
 
   useEffect(() => {
     const getProblems = async () => {
@@ -67,6 +70,26 @@ const ProblemsForm = () => {
         }}
       >
         <h1>문제 목록</h1>
+
+        {role === 'ROLE_ADMIN' && (
+          <div style={{ marginBottom: '20px', textAlign: 'right' }}>
+            <Link to="/create-problem">
+              <button
+                style={{
+                  padding: '10px 20px', // 패딩 조정
+                  fontSize: '16px', // 폰트 크기 조정
+                  backgroundColor: '#4CAF50', // 버튼 색상
+                  color: 'white', // 텍스트 색상
+                  border: 'none', // 기본 테두리 제거
+                  borderRadius: '5px', // 둥근 모서리
+                  cursor: 'pointer', // 마우스 커서 변경
+                }}
+              >
+                문제 생성
+              </button>
+            </Link>
+          </div>
+        )}
         <div
           style={{
             display: 'flex',

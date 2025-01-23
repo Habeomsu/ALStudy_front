@@ -20,8 +20,7 @@ const fetchProblems = async (
       'GET'
     );
     if (problemsData) {
-      const problems = JSON.parse(problemsData);
-      return problems; // 문제 목록 반환
+      return problemsData; // 문제 목록 반환 (JSON 형태)
     }
   } catch (error) {
     console.error('문제 가져오기 오류:', error);

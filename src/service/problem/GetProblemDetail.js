@@ -5,7 +5,7 @@ const fetchProblemDetail = async (id, navigate, location) => {
   const data = await FetchAuthorizedPage(url, navigate, location, 'GET');
 
   if (data) {
-    return JSON.parse(data); // JSON 형식으로 파싱하여 반환
+    return data; // JSON 형식으로 파싱하여 반환
   } else {
     throw new Error('문제 정보를 가져오는 데 실패했습니다.');
   }

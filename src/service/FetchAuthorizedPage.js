@@ -13,13 +13,14 @@ const FetchAuthorizedPage = async (
       method: method,
       credentials: 'include',
       headers: {
+        'Content-Type': 'application/json',
         access: window.localStorage.getItem('access'), // local storage 의 access 토큰을 요청 헤더에 추가
       },
       body: body ? JSON.stringify(body) : null, // POST 요청 시 본문 추가
     });
 
     if (response.ok) {
-      return await response.text();
+      return await response.json();
     } else {
       // unauthorized code -> 1. 재발급 요청  2. 재발급 요청 성공 or 실패 핸들링
       const reissueSuccess = await FetchReissue();
