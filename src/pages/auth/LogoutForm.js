@@ -4,7 +4,7 @@ import { useLogin } from '../../contexts/AuthContext';
 
 const LogoutForm = () => {
   const navigate = useNavigate();
-  const { setIsLoggedIn, setLoginUser } = useLogin();
+  const { setIsLoggedIn, setLoginUser, setRole } = useLogin();
 
   const fetchLogout = async () => {
     try {
@@ -21,6 +21,7 @@ const LogoutForm = () => {
 
         setIsLoggedIn(false);
         setLoginUser(null);
+        setRole(null);
         navigate('/', { replace: true }); // 홈으로 리디렉션
       } else {
         alert('로그아웃 실패');

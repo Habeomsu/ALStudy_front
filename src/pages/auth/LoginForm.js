@@ -5,13 +5,12 @@ import { useLogin } from '../../contexts/AuthContext';
 const LoginForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { setIsLoggedIn, setLoginUser } = useLogin();
+  const { setIsLoggedIn, setLoginUser, setRole } = useLogin();
 
   const prevUrl = location.state || '/';
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
   const fetchLogin = async (credentials) => {
     try {
       const response = await fetch('http://localhost:8080/login', {
@@ -34,7 +33,8 @@ const LoginForm = () => {
         window.localStorage.setItem('role', result.role);
 
         setIsLoggedIn(true);
-        setLoginUser(result);
+        setLoginUser(result.username);
+        setRole(result.role);
 
         // 로그인 완료 후, 이전 요청이 존재하면 이전 요청으로 이동
         navigate(prevUrl, { replace: true });

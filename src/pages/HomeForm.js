@@ -5,6 +5,10 @@ const HomeForm = () => {
   const { isLoggedIn, loginUser, role } = useLogin();
   return (
     <div style={styles.container}>
+      {/* 사용자 역할에 따라 메시지 표시 */}
+      {role === 'ROLE_ADMIN' && (
+        <h2 style={styles.subtitle}>관리자로 접속 중입니다.</h2>
+      )}
       <h1 style={styles.title}>알쓰에 오신걸 환영합니다.</h1>
 
       <h2>알쓰의 장점</h2>
