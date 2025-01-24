@@ -7,6 +7,8 @@ import { useLogin } from '../../contexts/AuthContext';
 const ProblemsDetailForm = () => {
   const { problemId } = useParams(); // URL 파라미터에서 문제 ID 가져오기
   const [problemDetail, setProblemDetail] = useState(null);
+  const [testCases, setTestCases] = useState([]);
+  const [showTestCases, setShowTestCases] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { role } = useLogin();
@@ -26,6 +28,24 @@ const ProblemsDetailForm = () => {
 
     loadProblemDetail();
   }, [problemId, navigate, location]);
+
+  // 테스트 케이스 가져오기
+  const fetchTestCases = async () => {
+    const url = `http://localhost:8080/testcase/${problemId}`; // 테스트 케이스 API 경로
+    const response = await FetchAuthorizedPage(url, navigate, location);
+    if (response && response.isSuccess) {
+      setTestCases(response.result); // 테스트 케이스 결과 저장
+    } else {
+      alert('테스트 케이스를 가져오는 데 실패했습니다.');
+    }
+  };
+
+  const handleToggleTestCases = async () => {
+    if (!showTestCases) {
+      await fetchTestCases(); // 테스트 케이스를 가져옵니다.
+    }
+    setShowTestCases((prev) => !prev); // 토글 상태 변경
+  };
 
   const handleDelete = async () => {
     const confirmDelete = window.confirm('정말로 이 문제를 삭제하시겠습니까?');
@@ -124,7 +144,8 @@ const ProblemsDetailForm = () => {
               </div>
             </div>
           </div>
-          {role === 'ROLE_ADMIN' && ( // ROLE_ADMIN일 경우에만 버튼 표시
+
+          {role === 'ROLE_ADMIN' && ( // ROLE_ADMIN일 경우에만 수정 및 삭제 버튼 표시
             <div
               style={{
                 marginTop: '20px',
@@ -162,6 +183,117 @@ const ProblemsDetailForm = () => {
               >
                 삭제하기
               </button>
+            </div>
+          )}
+
+          {role === 'ROLE_ADMIN' && ( // ROLE_ADMIN일 경우에만 테스트 케이스 표시
+            <div>
+              <button
+                onClick={handleToggleTestCases}
+                style={{ marginTop: '20px' }}
+              >
+                {showTestCases ? '테스트 케이스 숨기기' : '테스트 케이스 보기'}
+              </button>
+              {showTestCases && (
+                <div
+                  style={{
+                    marginTop: '10px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  {testCases.length > 0 ? (
+                    testCases.map((testCase, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          marginBottom: '10px',
+                        }}
+                      >
+                        <div
+                          style={{
+                            border: '1px solid #ccc',
+                            padding: '10px',
+                            borderRadius: '5px',
+                            backgroundColor: '#f9f9f9',
+                            whiteSpace: 'pre-wrap',
+                            flex: 1,
+                            marginRight: '10px',
+                          }}
+                        >
+                          <strong>입력:</strong> {testCase.input} <br />
+                        </div>
+                        <div
+                          style={{
+                            border: '1px solid #ccc',
+                            padding: '10px',
+                            borderRadius: '5px',
+                            backgroundColor: '#f9f9f9',
+                            whiteSpace: 'pre-wrap',
+                            flex: 1,
+                          }}
+                        >
+                          <strong>출력:</strong> {testCase.expectedOutput}{' '}
+                          <br />
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p>테스트 케이스가 없습니다.</p>
+                  )}
+                  <div
+                    style={{
+                      marginTop: '10px',
+                      display: 'flex',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <button
+                      style={{
+                        padding: '10px 20px',
+                        fontSize: '16px',
+                        backgroundColor: '#4CAF50',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        marginRight: '10px',
+                      }}
+                    >
+                      생성
+                    </button>
+                    <button
+                      style={{
+                        padding: '10px 20px',
+                        fontSize: '16px',
+                        backgroundColor: '#2196F3',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        marginRight: '10px',
+                      }}
+                    >
+                      수정
+                    </button>
+                    <button
+                      style={{
+                        padding: '10px 20px',
+                        fontSize: '16px',
+                        backgroundColor: '#F44336',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      삭제
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

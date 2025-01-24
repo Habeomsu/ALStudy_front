@@ -72,7 +72,7 @@ const ProblemsForm = () => {
         <h1>문제 목록</h1>
 
         {role === 'ROLE_ADMIN' && (
-          <div style={{ marginBottom: 'px', textAlign: 'right' }}>
+          <div style={{ marginBottom: '15px', textAlign: 'right' }}>
             <Link to="/create-problem">
               <button
                 style={{
