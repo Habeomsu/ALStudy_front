@@ -9,6 +9,7 @@ import ProblemsDetailForm from '../pages/problem/ProblemsDetailForm';
 import CreateProblemForm from '../pages/problem/CreateProblemForm';
 import UpdateProblemForm from '../pages/problem/UpdateProblemForm';
 import CreateTestCaseForm from '../pages/testcase/CreateTestCaseForm';
+import UpdateTestCaseForm from '../pages/testcase/UpdateTestCaseForm';
 const MyRoutes = () => {
   const { isLoggedIn, role } = useLogin();
   // 로그인 여부에 따라서 조건부 라우팅
@@ -34,6 +35,12 @@ const MyRoutes = () => {
         <Route
           path="/create-testcase/:problemId"
           element={<CreateTestCaseForm />}
+        />
+      )}
+      {isLoggedIn && (
+        <Route
+          path="/update-testcase/:problemId/:testCaseId"
+          element={<UpdateTestCaseForm />}
         />
       )}
     </Routes>

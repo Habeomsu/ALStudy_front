@@ -67,6 +67,29 @@ const ProblemsDetailForm = () => {
     }
   };
 
+  const handleDeleteTestCase = async (testCaseId) => {
+    const confirmDelete = window.confirm(
+      '정말로 이 테스트 케이스를 삭제하시겠습니까?'
+    );
+    if (confirmDelete) {
+      const url = `http://localhost:8080/testcase/${problemId}/${testCaseId}`; // 테스트 케이스 삭제 API 경로
+      const response = await FetchAuthorizedPage(
+        url,
+        navigate,
+        location,
+        'DELETE'
+      );
+
+      if (response && response.isSuccess) {
+        alert('테스트 케이스가 삭제되었습니다.');
+        // 테스트 케이스 재로딩
+        fetchTestCases();
+      } else {
+        alert('테스트 케이스 삭제에 실패했습니다: ' + (response.message || ''));
+      }
+    }
+  };
+
   const formatText = (text) => {
     if (!text) return null;
     return text.split('\n').map((line, index) => (
@@ -203,9 +226,9 @@ const ProblemsDetailForm = () => {
                   }}
                 >
                   {testCases.length > 0 ? (
-                    testCases.map((testCase, index) => (
+                    testCases.map((testCase) => (
                       <div
-                        key={index}
+                        key={testCase.id} // 각 테스트 케이스의 고유 ID를 키로 사용
                         style={{
                           display: 'flex',
                           justifyContent: 'space-between',
@@ -238,6 +261,47 @@ const ProblemsDetailForm = () => {
                           <strong>출력:</strong> {testCase.expectedOutput}{' '}
                           <br />
                         </div>
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            marginLeft: '10px',
+                          }}
+                        >
+                          <Link
+                            to={`/update-testcase/${problemId}/${testCase.id}`}
+                          >
+                            <button
+                              style={{
+                                padding: '5px 10px',
+                                fontSize: '14px',
+                                backgroundColor: '#2196F3',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '5px',
+                                cursor: 'pointer',
+                                marginBottom: '5px',
+                              }}
+                            >
+                              수정
+                            </button>
+                          </Link>
+                          <button
+                            onClick={() => handleDeleteTestCase(testCase.id)} // 삭제 함수 호출
+                            style={{
+                              padding: '5px 10px',
+                              fontSize: '14px',
+                              backgroundColor: '#F44336',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '5px',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            삭제
+                          </button>
+                        </div>
                       </div>
                     ))
                   ) : (
@@ -266,35 +330,6 @@ const ProblemsDetailForm = () => {
                         생성
                       </button>
                     </Link>
-                    <Link to={`/update-testcase/${problemId}`}>
-                      <button
-                        style={{
-                          padding: '10px 20px',
-                          fontSize: '16px',
-                          backgroundColor: '#2196F3',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '5px',
-                          cursor: 'pointer',
-                          marginRight: '10px',
-                        }}
-                      >
-                        수정
-                      </button>
-                    </Link>
-                    <button
-                      style={{
-                        padding: '10px 20px',
-                        fontSize: '16px',
-                        backgroundColor: '#F44336',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      삭제
-                    </button>
                   </div>
                 </div>
               )}
