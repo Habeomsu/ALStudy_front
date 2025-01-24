@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import fetchProblemDetail from '../../service/problem/GetProblemDetail';
+import FetchAuthorizedPage from '../../service/FetchAuthorizedPage';
+import { useLogin } from '../../contexts/AuthContext';
 
 const ProblemsDetailForm = () => {
   const { problemId } = useParams(); // URL 파라미터에서 문제 ID 가져오기
   const [problemDetail, setProblemDetail] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-
+  const { role } = useLogin();
   useEffect(() => {
     const loadProblemDetail = async () => {
       try {
@@ -24,6 +26,26 @@ const ProblemsDetailForm = () => {
 
     loadProblemDetail();
   }, [problemId, navigate, location]);
+
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm('정말로 이 문제를 삭제하시겠습니까?');
+    if (confirmDelete) {
+      const url = `http://localhost:8080/problems/${problemId}`; // 실제 API 경로로 변경 필요
+      const response = await FetchAuthorizedPage(
+        url,
+        navigate,
+        location,
+        'DELETE'
+      );
+
+      if (response && response.isSuccess) {
+        alert('문제가 삭제되었습니다.');
+        navigate('/problems'); // 문제 목록 페이지로 이동
+      } else {
+        alert('문제 삭제에 실패했습니다: ' + (response.message || ''));
+      }
+    }
+  };
 
   const formatText = (text) => {
     if (!text) return null;
@@ -102,6 +124,46 @@ const ProblemsDetailForm = () => {
               </div>
             </div>
           </div>
+          {role === 'ROLE_ADMIN' && ( // ROLE_ADMIN일 경우에만 버튼 표시
+            <div
+              style={{
+                marginTop: '20px',
+                display: 'flex',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <Link to={`/update-problem/${problemId}`}>
+                <button
+                  style={{
+                    padding: '10px 20px',
+                    fontSize: '16px',
+                    backgroundColor: '#2196F3',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    marginRight: '10px',
+                  }}
+                >
+                  수정하기
+                </button>
+              </Link>
+              <button
+                onClick={handleDelete}
+                style={{
+                  padding: '10px 20px',
+                  fontSize: '16px',
+                  backgroundColor: '#F44336',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                }}
+              >
+                삭제하기
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <p>로딩 중...</p>
