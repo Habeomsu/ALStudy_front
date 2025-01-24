@@ -250,34 +250,38 @@ const ProblemsDetailForm = () => {
                       justifyContent: 'flex-end',
                     }}
                   >
-                    <button
-                      style={{
-                        padding: '10px 20px',
-                        fontSize: '16px',
-                        backgroundColor: '#4CAF50',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        marginRight: '10px',
-                      }}
-                    >
-                      생성
-                    </button>
-                    <button
-                      style={{
-                        padding: '10px 20px',
-                        fontSize: '16px',
-                        backgroundColor: '#2196F3',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        marginRight: '10px',
-                      }}
-                    >
-                      수정
-                    </button>
+                    <Link to={`/create-testcase/${problemId}`}>
+                      <button
+                        style={{
+                          padding: '10px 20px',
+                          fontSize: '16px',
+                          backgroundColor: '#4CAF50',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '5px',
+                          cursor: 'pointer',
+                          marginRight: '10px',
+                        }}
+                      >
+                        생성
+                      </button>
+                    </Link>
+                    <Link to={`/update-testcase/${problemId}`}>
+                      <button
+                        style={{
+                          padding: '10px 20px',
+                          fontSize: '16px',
+                          backgroundColor: '#2196F3',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '5px',
+                          cursor: 'pointer',
+                          marginRight: '10px',
+                        }}
+                      >
+                        수정
+                      </button>
+                    </Link>
                     <button
                       style={{
                         padding: '10px 20px',
