@@ -21,38 +21,23 @@ const FetchAuthorizedPage = async (
       body: body ? JSON.stringify(body) : null,
     });
 
-    if (response.ok) {
-      return await response.json();
-    } else if (response.status === 401) {
-      const data = await response.json();
-      console.log(data);
-      if (data.code === 'JWT400_1') {
-        // 리프레시 토큰을 사용하여 액세스 토큰 재발급 시도
-        const reissueSuccess = await FetchReissue();
-        if (reissueSuccess) {
-          return await FetchAuthorizedPage(
-            url,
-            navigate,
-            location,
-            method,
-            body
-          );
-        } else {
-          alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
-          window.localStorage.removeItem('access');
+    // 응답 데이터를 그대로 반환
+    const data = await response.json();
 
-          navigate('/login', { state: location.pathname });
-        }
-      } else {
-        alert(data.message || '인증 오류가 발생했습니다.');
-      }
-    } else {
-      console.error('Error occurred:', response.status);
-      alert('문제가 발생했습니다. 다시 시도해 주세요.');
-    }
+    // 성공 여부에 따라 반환
+    return {
+      ...data,
+      isSuccess: response.ok, // 응답 성공 여부 추가
+    };
   } catch (error) {
     console.log('error: ', error);
+    return {
+      isSuccess: false,
+      code: 'ERROR',
+      message: '서버와의 연결에 문제가 발생했습니다.',
+      result: null,
+    };
   }
-  return null;
 };
+
 export default FetchAuthorizedPage;

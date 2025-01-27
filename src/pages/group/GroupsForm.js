@@ -30,6 +30,38 @@ const GroupsForm = () => {
 
   const totalPages = Math.ceil(totalElements / size);
 
+  // 실제 삭제 요청을 수행하는 함수
+  const deleteGroup = async (groupId, password) => {
+    const url = `http://localhost:8080/groups/${groupId}?password=${encodeURIComponent(
+      password
+    )}`; // 비밀번호를 쿼리 파라미터로 추가
+    return await FetchAuthorizedPage(url, navigate, location, 'DELETE'); // 응답 반환
+  };
+
+  // 그룹 삭제 함수
+  const handleDeleteGroup = async (groupId) => {
+    const deleteConfirm = window.prompt('비밀번호를 입력하세요:'); // 비밀번호 입력 요청
+    if (deleteConfirm) {
+      const response = await deleteGroup(groupId, deleteConfirm); // 비밀번호와 함께 삭제 요청
+      if (response) {
+        if (response.isSuccess) {
+          alert('그룹이 삭제되었습니다.');
+          setGroups(groups.filter((group) => group.id !== groupId)); // 삭제된 그룹을 목록에서 제거
+          setTotalElements((prev) => prev - 1); // 전체 요소 수 감소
+        } else {
+          // response가 null이 아닐 경우에만 message에 접근
+          alert(
+            `그룹 삭제에 실패했습니다. ${
+              response.message || '알 수 없는 오류가 발생했습니다.'
+            }`
+          );
+        }
+      } else {
+        alert('서버와의 연결에 문제가 발생했습니다.');
+      }
+    }
+  };
+
   return (
     <div
       style={{
@@ -98,26 +130,44 @@ const GroupsForm = () => {
                     border: '1px solid #ddd',
                     borderRadius: '5px',
                     backgroundColor: '#f9f9f9',
+                    display: 'flex', // 플렉스 박스 사용
+                    justifyContent: 'space-between', // 양쪽 끝으로 정렬
+                    alignItems: 'center', // 수직 정렬
                   }}
                 >
-                  <Link
-                    to={`/groups/${group.id}`}
-                    style={{ fontWeight: 'bold' }}
-                  >
-                    {group.groupname}
-                  </Link>
-                  <span> (관리자: {group.username})</span>
-                  <span> (예치금: {group.depositAmount})</span>
                   <div>
-                    <span>
-                      모집 기간: {new Date(group.deadline).toLocaleString()}
-                    </span>
-                    <span>
-                      {' '}
-                      | 스터디 종료 기간:{' '}
-                      {new Date(group.stutyEndDate).toLocaleString()}
-                    </span>
+                    <Link
+                      to={`/groups/${group.id}`}
+                      style={{ fontWeight: 'bold' }}
+                    >
+                      {group.groupname}
+                    </Link>
+                    <span> (관리자: {group.username})</span>
+                    <span> (예치금: {group.depositAmount})</span>
+                    <div>
+                      <span>
+                        모집 기간: {new Date(group.deadline).toLocaleString()}
+                      </span>
+                      <span>
+                        {' '}
+                        | 스터디 종료 기간:{' '}
+                        {new Date(group.stutyEndDate).toLocaleString()}
+                      </span>
+                    </div>
                   </div>
+                  <button
+                    onClick={() => handleDeleteGroup(group.id)}
+                    style={{
+                      backgroundColor: '#f44336', // 삭제 버튼 색상
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '5px',
+                      cursor: 'pointer',
+                      marginLeft: '15px', // 버튼 사이 마진
+                    }}
+                  >
+                    삭제
+                  </button>
                 </div>
               </li>
             ))
