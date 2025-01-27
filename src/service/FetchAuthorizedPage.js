@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useLogin } from '../contexts/AuthContext';
 import FetchReissue from './FetchReissue';
 
@@ -11,24 +10,63 @@ const FetchAuthorizedPage = async (
   body = null
 ) => {
   try {
+    const token = window.localStorage.getItem('access');
     const response = await fetch(url, {
       method: method,
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        access: window.localStorage.getItem('access'),
+        Authorization: `Bearer ${token}`, // Bearer 토큰 형식으로 설정
       },
       body: body ? JSON.stringify(body) : null,
     });
 
-    // 응답 데이터를 그대로 반환
+    // 응답 데이터 처리
     const data = await response.json();
 
-    // 성공 여부에 따라 반환
-    return {
-      ...data,
-      isSuccess: response.ok, // 응답 성공 여부 추가
-    };
+    if (response.ok) {
+      return {
+        ...data,
+        isSuccess: true, // 응답 성공 여부 추가
+      };
+    } else if (response.status === 401) {
+      // 401 Unauthorized인 경우 리프레시 토큰 요청
+      const reissueSuccess = await FetchReissue();
+      if (reissueSuccess) {
+        // 재발급이 성공하면 새로운 토큰으로 원래 요청 다시 시도
+        const newToken = window.localStorage.getItem('access'); // 새로 발급된 토큰 가져오기
+        const retryResponse = await fetch(url, {
+          method: method,
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${newToken}`, // 새 토큰 사용
+          },
+          body: body ? JSON.stringify(body) : null,
+        });
+
+        const retryData = await retryResponse.json();
+        return {
+          ...retryData,
+          isSuccess: retryResponse.ok, // 재요청 성공 여부 추가
+        };
+      } else {
+        // 리프레시 토큰 요청에 실패한 경우
+        return {
+          isSuccess: false,
+          code: 'ERROR',
+          message: '리프레시 토큰 요청에 실패했습니다.',
+          result: null,
+        };
+      }
+    } else {
+      return {
+        isSuccess: false,
+        code: data.code || 'ERROR',
+        message: data.message || '서버에서 오류가 발생했습니다.',
+        result: null,
+      };
+    }
   } catch (error) {
     console.log('error: ', error);
     return {
