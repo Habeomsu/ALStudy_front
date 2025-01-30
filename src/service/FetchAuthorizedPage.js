@@ -16,7 +16,7 @@ const FetchAuthorizedPage = async (
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`, // Bearer 토큰 형식으로 설정
+        access: token, // Bearer 토큰 형식으로 설정
       },
       body: body ? JSON.stringify(body) : null,
     });
@@ -34,13 +34,13 @@ const FetchAuthorizedPage = async (
       const reissueSuccess = await FetchReissue();
       if (reissueSuccess) {
         // 재발급이 성공하면 새로운 토큰으로 원래 요청 다시 시도
-        const newToken = window.localStorage.getItem('access'); // 새로 발급된 토큰 가져오기
+        const newtoken = window.localStorage.getItem('access'); // 새로 발급된 토큰 가져오기
         const retryResponse = await fetch(url, {
           method: method,
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${newToken}`, // 새 토큰 사용
+            access: newtoken, // 새 토큰 사용
           },
           body: body ? JSON.stringify(body) : null,
         });
