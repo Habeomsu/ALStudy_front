@@ -30,6 +30,31 @@ const UserGroupForm = () => {
 
   const totalPages = Math.ceil(totalElements / size);
 
+  // 그룹 탈퇴 함수
+  const resignGroup = async (groupId) => {
+    const confirmResign = window.confirm(
+      '정말로 이 그룹에서 탈퇴하시겠습니까?'
+    );
+    if (confirmResign) {
+      const url = `http://localhost:8080/usergroups/${groupId}`; // 탈퇴 API URL
+      const response = await FetchAuthorizedPage(
+        url,
+        navigate,
+        location,
+        'DELETE'
+      );
+
+      if (response && response.isSuccess) {
+        alert('그룹에서 탈퇴되었습니다.');
+        // 그룹 목록 업데이트
+        setUserGroups(usergroups.filter((group) => group.groupId !== groupId));
+        setTotalElements((prev) => prev - 1); // 전체 요소 수 감소
+      } else {
+        alert('그룹 탈퇴에 실패했습니다.'); // 오류 메시지
+      }
+    }
+  };
+
   return (
     <div
       style={{
@@ -100,6 +125,19 @@ const UserGroupForm = () => {
                       </span>
                     </div>
                   </div>
+                  <button
+                    onClick={() => resignGroup(group.groupId)}
+                    style={{
+                      backgroundColor: '#f44336',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '5px',
+                      cursor: 'pointer',
+                      marginLeft: '15px',
+                    }}
+                  >
+                    탈퇴
+                  </button>
                 </div>
               </li>
             ))
