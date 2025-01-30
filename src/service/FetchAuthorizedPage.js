@@ -25,10 +25,7 @@ const FetchAuthorizedPage = async (
     const data = await response.json();
 
     if (response.ok) {
-      return {
-        ...data,
-        isSuccess: true, // 응답 성공 여부 추가
-      };
+      return data;
     } else if (response.status === 401) {
       // 401 Unauthorized인 경우 리프레시 토큰 요청
       const reissueSuccess = await FetchReissue();
@@ -47,8 +44,7 @@ const FetchAuthorizedPage = async (
 
         const retryData = await retryResponse.json();
         return {
-          ...retryData,
-          isSuccess: retryResponse.ok, // 재요청 성공 여부 추가
+          retryData,
         };
       } else {
         // 리프레시 토큰 요청에 실패한 경우

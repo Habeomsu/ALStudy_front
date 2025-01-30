@@ -73,7 +73,7 @@ const UserGroupForm = () => {
         <ul>
           {usergroups.length > 0 ? (
             usergroups.map((group) => (
-              <li key={group.id} style={{ marginBottom: '15px' }}>
+              <li key={group.groupId} style={{ marginBottom: '15px' }}>
                 <div
                   style={{
                     padding: '15px',
@@ -87,7 +87,7 @@ const UserGroupForm = () => {
                 >
                   <div>
                     <Link
-                      to={`/groups/${group.id}`}
+                      to={`/usergroups/${group.groupId}`}
                       style={{ fontWeight: 'bold' }}
                     >
                       {group.groupName}

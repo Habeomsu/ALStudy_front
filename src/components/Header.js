@@ -1,11 +1,12 @@
 import React from 'react';
 import { Container, Nav, Navbar } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useLogin } from '../contexts/AuthContext';
 import LogoutForm from '../pages/auth/LogoutForm';
 
 const Header = () => {
   const { isLoggedIn, role, loginUser } = useLogin();
+
   return (
     <Navbar bg="dark" variant="dark">
       <Container>
@@ -36,7 +37,7 @@ const Header = () => {
             </>
           )}
         </Nav>
-        <Nav>
+        <Nav className="ms-auto">
           {isLoggedIn && (
             <span className="navbar-text me-2">
               {loginUser || '사용자'}
