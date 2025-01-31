@@ -59,6 +59,32 @@ const GroupProblemForm = () => {
     navigate(`/usergroups/${groupId}/create-problem`, { state: { groupId } });
   };
 
+  const handleDeleteProblem = async (groupProblemId) => {
+    const confirmDelete = window.confirm('정말로 이 문제를 삭제하시겠습니까?');
+    if (confirmDelete) {
+      const url = `http://localhost:8080/groupproblem/${groupId}/${groupProblemId}`; // 수정된 문제 삭제 API URL
+      const response = await FetchAuthorizedPage(
+        url,
+        navigate,
+        location,
+        'DELETE'
+      );
+
+      if (response && response.isSuccess) {
+        alert('문제가 삭제되었습니다.');
+        // 문제 목록 갱신
+        setProblemData(
+          problemData.filter(
+            (problem) => problem.groupProblemId !== groupProblemId
+          )
+        );
+        setTotalElements((prev) => prev - 1); // 전체 요소 수 감소
+      } else {
+        alert('문제 삭제에 실패했습니다.');
+      }
+    }
+  };
+
   return (
     <div style={{ display: 'flex' }}>
       <UsergroupNavBar />
@@ -153,6 +179,24 @@ const GroupProblemForm = () => {
                     감점: {problem.deductionAmount}
                   </span>
                   <span style={{ flex: 1 }}>상태: {problem.status}</span>
+                  {isLeader && ( // 리더일 경우에만 삭제 버튼 표시
+                    <button
+                      onClick={() =>
+                        handleDeleteProblem(problem.groupProblemId)
+                      }
+                      style={{
+                        marginLeft: '10px',
+                        padding: '5px 10px',
+                        backgroundColor: '#f44336',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      삭제
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
