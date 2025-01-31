@@ -2,7 +2,6 @@ import { Cookies } from 'react-cookie';
 
 const FetchReissue = async () => {
   try {
-    const apiUrl = process.env.REACT_APP_API_URL;
     const response = await fetch('http://localhost:8080/reissue', {
       method: 'POST',
       credentials: 'include', // 쿠키 포함
@@ -10,10 +9,13 @@ const FetchReissue = async () => {
         'Content-Type': 'application/json',
       },
     });
+
     console.log('이전 토큰:', localStorage.getItem('access'));
+
     if (response.ok) {
+      const jsonData = await response.json(); // 비동기 처리
       console.log('response.status:', response.status);
-      console.log('response.json()', response.json());
+      console.log('response.json()', jsonData);
       const accessToken = response.headers.get('access'); // fetch에서는 get 메서드 사용
 
       // 토큰 재발급 성공
@@ -27,6 +29,7 @@ const FetchReissue = async () => {
       }
     } else {
       // 토큰 재발급 실패
+      console.log('토큰 재발급 실패:', response.status);
       localStorage.removeItem('access');
       const cookies = new Cookies();
       cookies.set('refresh', null, { maxAge: 0 }); // 리프레시 토큰 삭제

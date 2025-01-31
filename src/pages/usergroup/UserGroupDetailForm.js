@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import UsergroupNavBar from '../../components/UsergroupNavBar';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import FetchAuthorizedPage from '../../service/FetchAuthorizedPage';
 
 const UserGroupDetailWithMembersForm = () => {
@@ -9,6 +9,7 @@ const UserGroupDetailWithMembersForm = () => {
   const location = useLocation();
   const [groupData, setGroupData] = useState(null);
   const [membersData, setMembersData] = useState([]);
+  const [todayProblems, setTodayProblems] = useState([]); // 오늘의 문제 상태 추가
   const [error, setError] = useState(null);
   const [totalElements, setTotalElements] = useState(0);
   const [page, setPage] = useState(0);
@@ -39,8 +40,20 @@ const UserGroupDetailWithMembersForm = () => {
       }
     };
 
+    const fetchTodayProblems = async () => {
+      const url = `http://localhost:8080/groupproblem/${groupId}/todayProblem`; // 오늘의 문제 API URL
+      const response = await FetchAuthorizedPage(url, navigate, location);
+
+      if (response && response.isSuccess) {
+        setTodayProblems(response.result.groupProblemResDtos); // 오늘의 문제 데이터 업데이트
+      } else {
+        setError(response.message || '오늘의 문제를 불러오는 데 실패했습니다.');
+      }
+    };
+
     fetchGroupDetails();
     fetchMembers();
+    fetchTodayProblems(); // 오늘의 문제 가져오기
   }, [groupId, navigate, location, page, size, sort]);
 
   const totalPages = Math.ceil(totalElements / size);
@@ -86,9 +99,37 @@ const UserGroupDetailWithMembersForm = () => {
               textAlign: 'center',
             }}
           >
-            <h2>왼쪽 데이터 영역</h2>
-            {/* 여기에 다른 데이터를 추가할 수 있습니다 */}
-            <p>이곳에 다른 데이터를 입력하세요.</p>
+            <h2>오늘의 문제</h2>
+            {todayProblems.length > 0 ? (
+              <ul style={{ listStyleType: 'none', padding: 0 }}>
+                {todayProblems.map((problem) => (
+                  <li
+                    key={problem.groupProblemId}
+                    style={{
+                      marginBottom: '15px',
+                      padding: '10px',
+                      border: '1px solid #ccc',
+                      borderRadius: '5px',
+                    }}
+                  >
+                    <Link
+                      to={`/usergroups/${groupId}/problems/${problem.groupProblemId}`}
+                      style={{ fontWeight: 'bold' }}
+                    >
+                      문제: {problem.title}
+                    </Link>
+                    <span>
+                      {' '}
+                      마감일: {new Date(problem.deadline).toLocaleString()}
+                    </span>
+                    <span> 차감액: {problem.deductionAmount}</span>
+                    <span> 상태: {problem.status}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div>오늘의 문제가 없습니다.</div>
+            )}
           </div>
 
           {/* 오른쪽 멤버 목록 공간 */}

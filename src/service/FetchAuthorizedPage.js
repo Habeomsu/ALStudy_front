@@ -34,7 +34,6 @@ const FetchAuthorizedPage = async (
 
         if (reissueSuccess) {
           const newToken = window.localStorage.getItem('access'); // 새로 발급된 토큰 가져오기
-          console.log('새 발급된 토큰:', newToken); // 새로 발급된 토큰 확인
 
           // 새로운 토큰으로 원래 요청 다시 시도
           const retryResponse = await fetch(url, {
@@ -57,7 +56,6 @@ const FetchAuthorizedPage = async (
           }
         } else {
           alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
-          window.localStorage.removeItem('access');
           navigate('/login', { state: location.pathname });
         }
       } else {
