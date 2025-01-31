@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import FetchAuthorizedPage from '../../service/FetchAuthorizedPage';
 import UsergroupNavBar from '../../components/UsergroupNavBar';
 
@@ -7,30 +7,57 @@ const GroupProblemForm = () => {
   const { groupId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [problemData, setProblemData] = useState([]); // 그룹 데이터
+  const [problemData, setProblemData] = useState([]); // 그룹 문제 데이터
   const [totalElements, setTotalElements] = useState(0);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
   const [sort, setSort] = useState('desc');
+  const [isLeader, setIsLeader] = useState(false); // 리더 여부 상태
+  const [groupData, setGroupData] = useState(null); // 그룹 데이터
 
   useEffect(() => {
-    const fetchMembers = async () => {
-      const url = `http://localhost:8080/groupproblem/${groupId}?page=${page}&size=${size}&sort=${sort}`; // 멤버 API URL
+    const fetchGroupDetails = async () => {
+      const url = `http://localhost:8080/groups/${groupId}`;
       const response = await FetchAuthorizedPage(url, navigate, location);
 
       if (response && response.isSuccess) {
-        setProblemData(response.result.groupProblemResDtos); // 멤버 정보 저장
-        setTotalElements(response.result.totalElements); // 전체 요소 수 저장
+        setGroupData(response.result);
+
+        // 로컬 저장소에서 현재 사용자 이름 가져오기
+        const currentUserName = window.localStorage.getItem('name');
+
+        // 그룹 리더 이름과 비교하여 리더 여부 설정
+        if (currentUserName === response.result.username) {
+          setIsLeader(true);
+        }
       } else {
-        setError(response.message || '멤버 정보를 불러오는 데 실패했습니다.');
+        setError(response.message || '그룹 정보를 불러오는 데 실패했습니다.');
       }
     };
 
-    fetchMembers();
+    const fetchProblem = async () => {
+      const url = `http://localhost:8080/groupproblem/${groupId}?page=${page}&size=${size}&sort=${sort}`; // 문제 API URL
+      const response = await FetchAuthorizedPage(url, navigate, location);
+
+      if (response && response.isSuccess) {
+        setProblemData(response.result.groupProblemResDtos); // 문제 정보 저장
+        setTotalElements(response.result.totalElements); // 전체 요소 수 저장
+      } else {
+        setError(response.message || '문제 정보를 불러오는 데 실패했습니다.');
+      }
+    };
+
+    fetchGroupDetails();
+    fetchProblem();
   }, [groupId, navigate, location, page, size, sort]);
 
   const totalPages = Math.ceil(totalElements / size);
+
+  const handleCreateProblem = () => {
+    // 문제 생성 페이지로 이동
+    navigate(`/usergroups/${groupId}/create-problem`, { state: { groupId } });
+  };
 
   return (
     <div style={{ display: 'flex' }}>
@@ -49,36 +76,83 @@ const GroupProblemForm = () => {
         }}
       >
         {error && <div style={{ color: 'red' }}>{error}</div>}
-        {/* 오류 메시지 표시 */}
+
+        {/* 문제 데이터가 있을 경우 */}
         {problemData.length > 0 ? (
           <>
-            <h1>그룹 문제 목록</h1>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '80%',
+                alignItems: 'center',
+              }}
+            >
+              <h1>그룹 문제 목록</h1>
+              {/* 문제 생성 버튼 (리더만 사용 가능) */}
+              {isLeader && (
+                <button
+                  onClick={handleCreateProblem}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: '#4CAF50',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  문제 생성
+                </button>
+              )}
+            </div>
             <div
               style={{
                 width: '80%',
                 display: 'flex',
-                flexWrap: 'wrap',
-                justifyContent: 'center',
+                flexDirection: 'column',
+                alignItems: 'center',
               }}
             >
               {problemData.map((problem) => (
                 <div
                   key={problem.groupProblemId}
                   style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
                     border: '1px solid #ccc',
                     borderRadius: '8px',
                     padding: '15px',
                     margin: '10px',
-                    width: '200px', // 박스 너비
+                    width: '100%', // 박스 너비를 전체로 설정
                     boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
                   }}
                 >
-                  <h3>{problem.title}</h3>
-                  <p>난이도: {problem.difficultyLevel}</p>
-                  <p>상태: {problem.status}</p>
-                  <p>작성일: {new Date(problem.createdAt).toLocaleString()}</p>
-                  <p>마감일: {new Date(problem.deadline).toLocaleString()}</p>
-                  <p>감점: {problem.deductionAmount}</p>
+                  <Link
+                    to={`/usergroups/${groupId}/problems/${problem.groupProblemId}`}
+                    style={{
+                      flex: 1,
+                      textDecoration: 'underline', // 밑줄 추가
+                      color: 'blue', // 클릭 가능한 링크 스타일
+                      cursor: 'pointer',
+                    }}
+                  >
+                    문제: {problem.title}
+                  </Link>
+                  <span style={{ flex: 1 }}>
+                    난이도: {problem.difficultyLevel}
+                  </span>
+                  <span style={{ flex: 1 }}>
+                    작성일: {new Date(problem.createdAt).toLocaleString()}
+                  </span>
+                  <span style={{ flex: 1 }}>
+                    마감일: {new Date(problem.deadline).toLocaleString()}
+                  </span>
+
+                  <span style={{ flex: 1 }}>
+                    감점: {problem.deductionAmount}
+                  </span>
+                  <span style={{ flex: 1 }}>상태: {problem.status}</span>
                 </div>
               ))}
             </div>

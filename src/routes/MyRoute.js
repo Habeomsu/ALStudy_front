@@ -17,6 +17,8 @@ import UserGroupForm from '../pages/usergroup/UserGroupForm';
 import UserGroupDetailForm from '../pages/usergroup/UserGroupDetailForm';
 import UserGroupMemberForm from '../pages/usergroup/UserGroupMemberForm';
 import GroupProblemForm from '../pages/groupProblem/GroupProblemForm';
+import CreateGroupProblemForm from '../pages/groupProblem/CreateGroupProblemForm';
+import GroupProblemDetailForm from '../pages/groupProblem/GroupProblemDetailForm';
 const MyRoutes = () => {
   const { isLoggedIn, role } = useLogin();
   // 로그인 여부에 따라서 조건부 라우팅
@@ -66,6 +68,14 @@ const MyRoutes = () => {
           <Route
             path="/usergroups/:groupId/problems"
             element={<GroupProblemForm />}
+          />
+          <Route
+            path="/usergroups/:groupId/create-problem"
+            element={<CreateGroupProblemForm />}
+          />
+          <Route
+            path="/usergroups/:groupId/problems/:groupProblemId"
+            element={<GroupProblemDetailForm />}
           />
         </>
       )}

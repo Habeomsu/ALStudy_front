@@ -10,7 +10,7 @@ const FetchReissue = async () => {
         'Content-Type': 'application/json',
       },
     });
-
+    console.log('이전 토큰:', localStorage.getItem('access'));
     if (response.ok) {
       console.log('response.status:', response.status);
       console.log('response.json()', response.json());
