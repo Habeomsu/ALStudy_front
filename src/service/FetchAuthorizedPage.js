@@ -1,4 +1,3 @@
-import { useLogin } from '../contexts/AuthContext';
 import FetchReissue from './FetchReissue';
 
 // 권한이 있는 페이지 접근 시 access 토큰을 검증
@@ -18,50 +17,55 @@ const FetchAuthorizedPage = async (
         'Content-Type': 'application/json',
         access: token, // Bearer 토큰 형식으로 설정
       },
-      body: body ? JSON.stringify(body) : null,
+      body: body ? JSON.stringify(body) : null, // POST 요청 시 본문 추가
     });
 
-    // 응답 데이터 처리
-    const data = await response.json();
+    // 응답 처리
+    const data = await response.json(); // 응답 데이터를 미리 가져옴
 
     if (response.ok) {
-      return data;
+      return data; // 성공 시 응답 데이터 반환
     } else if (response.status === 401) {
-      // 401 Unauthorized인 경우 리프레시 토큰 요청
-      const reissueSuccess = await FetchReissue();
-      if (reissueSuccess) {
-        // 재발급이 성공하면 새로운 토큰으로 원래 요청 다시 시도
-        const newtoken = window.localStorage.getItem('access'); // 새로 발급된 토큰 가져오기
-        const retryResponse = await fetch(url, {
-          method: method,
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            access: newtoken, // 새 토큰 사용
-          },
-          body: body ? JSON.stringify(body) : null,
-        });
+      console.log('첫응답 오류:', data);
 
-        const retryData = await retryResponse.json();
-        return {
-          retryData,
-        };
+      if (data.code === 'JWT400_1') {
+        const reissueSuccess = await FetchReissue();
+        console.log('reissueSuccess:', reissueSuccess);
+
+        if (reissueSuccess) {
+          const newToken = window.localStorage.getItem('access'); // 새로 발급된 토큰 가져오기
+          console.log('새 발급된 토큰:', newToken); // 새로 발급된 토큰 확인
+
+          // 새로운 토큰으로 원래 요청 다시 시도
+          const retryResponse = await fetch(url, {
+            method: method,
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              access: newToken, // 새 토큰 사용
+            },
+            body: body ? JSON.stringify(body) : null, // POST 요청 시 본문 추가
+          });
+
+          const retryData = await retryResponse.json(); // 재요청의 응답 데이터 가져오기
+
+          if (retryResponse.ok) {
+            return retryData; // 새 요청 결과 반환
+          } else {
+            console.log('재요청 실패:', retryData); // 오류 데이터 전체 출력
+            return retryData; // 오류 데이터 반환
+          }
+        } else {
+          alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
+          window.localStorage.removeItem('access');
+          navigate('/login', { state: location.pathname });
+        }
       } else {
-        // 리프레시 토큰 요청에 실패한 경우
-        return {
-          isSuccess: false,
-          code: 'ERROR',
-          message: '리프레시 토큰 요청에 실패했습니다.',
-          result: null,
-        };
+        return data; // 인증 오류의 경우에도 응답 데이터 반환
       }
     } else {
-      return {
-        isSuccess: false,
-        code: data.code || 'ERROR',
-        message: data.message || '서버에서 오류가 발생했습니다.',
-        result: null,
-      };
+      console.error('Error occurred:', response.status);
+      return data; // 오류가 발생하더라도 응답 데이터 반환
     }
   } catch (error) {
     console.log('error: ', error);

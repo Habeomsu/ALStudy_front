@@ -1,44 +1,41 @@
-import axios from 'axios';
 import { Cookies } from 'react-cookie';
 
 const FetchReissue = async () => {
   try {
-    const response = await axios.post(
-      'http://localhost:8080/reissue',
-      {},
-      {
-        withCredentials: true, // 쿠키 포함
-      }
-    );
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const response = await fetch(`${apiUrl}/auth/resign`, {
+      method: 'POST',
+      credentials: 'include', // 쿠키 포함
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-    // 성공적으로 리프레시 토큰을 재발급 받은 경우
-    if (response.status === 200) {
-      console.log('리프레시 토큰 재발급 성공:', response.data); // 성공 로그
-      localStorage.setItem(
-        'access',
-        response.headers['access'] || response.headers['Access']
-      ); // 대소문자 모두 확인
-      return true;
+    if (response.ok) {
+      console.log('response.status:', response.status);
+      console.log('response.json()', response.json());
+      const accessToken = response.headers.get('access'); // fetch에서는 get 메서드 사용
+
+      // 토큰 재발급 성공
+      if (accessToken) {
+        window.localStorage.setItem('access', accessToken); // "Bearer " 제거
+        console.log('access 토큰:', accessToken);
+        console.log('토큰 발급 성공');
+        return true;
+      } else {
+        console.log('accessToken이 없습니다.'); // 추가된 로그
+      }
     } else {
       // 토큰 재발급 실패
-      console.error(
-        '리프레시 토큰 재발급 실패: HTTP 상태 코드',
-        response.status
-      );
-      handleTokenReissueFailure();
+      localStorage.removeItem('access');
+      const cookies = new Cookies();
+      cookies.set('refresh', null, { maxAge: 0 }); // 리프레시 토큰 삭제
     }
   } catch (error) {
-    console.error('리프레시 토큰 재발급 중 오류 발생:', error); // 에러 로그
-    handleTokenReissueFailure(); // 실패 시 처리
+    console.error('Fetch error:', error);
   }
-  return false;
-};
 
-const handleTokenReissueFailure = () => {
-  localStorage.removeItem('access');
-  const cookies = new Cookies();
-  cookies.set('refresh', null, { maxAge: 0 }); // 리프레시 토큰 삭제
-  alert('세션이 만료되었습니다. 다시 로그인 해주세요.'); // 사용자 알림
+  return false;
 };
 
 export default FetchReissue;
