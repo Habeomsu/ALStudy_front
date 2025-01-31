@@ -63,11 +63,11 @@ const UserGroupDetailWithMembersForm = () => {
 
           {groupData ? (
             <>
-              <h1>{groupData.groupName}</h1>
+              <h1>{groupData.groupname}</h1>
               <p>관리자: {groupData.username}</p>
               <p>
                 스터디 기간: {new Date(groupData.deadline).toLocaleString()} ~{' '}
-                {new Date(groupData.studyEndDate).toLocaleString()}
+                {new Date(groupData.stutyEndDate).toLocaleString()}
               </p>
             </>
           ) : (
