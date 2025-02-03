@@ -51,7 +51,7 @@ const MySubmitForm = () => {
           alignItems: 'center',
         }}
       >
-        <GroupProblemButton groupId={groupId} groupProblemId={groupProblemId} />
+        <GroupProblemButton />
         {error && <div style={{ color: 'red' }}>{error}</div>}
         {loading ? (
           <div>로딩 중...</div>

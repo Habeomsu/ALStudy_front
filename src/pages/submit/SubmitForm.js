@@ -37,7 +37,7 @@ const SubmitForm = () => {
 
     if (response && response.isSuccess) {
       alert('코드가 성공적으로 제출되었습니다.');
-      navigate(`/usergroups/${groupId}/problems/${groupProblemId}`); // 문제 목록 페이지로 이동
+      navigate(`/usergroups/${groupId}/my-submit/${groupProblemId}`); // 문제 목록 페이지로 이동
     } else {
       alert(response.message || '코드 제출에 실패했습니다.');
     }
