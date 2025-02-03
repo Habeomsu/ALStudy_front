@@ -51,7 +51,7 @@ const GroupProblemDetailForm = () => {
           alignItems: 'center',
         }}
       >
-        <GroupProblemButton groupId={groupId} groupProblemId={groupProblemId} />
+        <GroupProblemButton />
         {error && <div style={{ color: 'red' }}>{error}</div>}
 
         {groupProblemData ? (

@@ -34,7 +34,9 @@ const GroupProblemButton = () => {
         제출
       </button>
       <button
-        onClick={() => handleNavigate(`/usergroups/${groupId}/my-submissions`)}
+        onClick={() =>
+          handleNavigate(`/usergroups/${groupId}/my-submit/${groupProblemId}`)
+        }
         style={buttonStyle}
       >
         내 제출
