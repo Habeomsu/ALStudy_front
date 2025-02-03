@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import FetchAuthorizedPage from '../../service/FetchAuthorizedPage';
 import UsergroupNavBar from '../../components/UsergroupNavBar';
+import GroupProblemButton from '../../components/GroupProblemButton';
 
 const GroupProblemDetailForm = () => {
   const { groupId, groupProblemId } = useParams(); // URL 파라미터에서 그룹 ID와 문제 ID 가져오기
@@ -50,6 +51,7 @@ const GroupProblemDetailForm = () => {
           alignItems: 'center',
         }}
       >
+        <GroupProblemButton groupId={groupId} groupProblemId={groupProblemId} />
         {error && <div style={{ color: 'red' }}>{error}</div>}
 
         {groupProblemData ? (

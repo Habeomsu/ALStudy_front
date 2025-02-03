@@ -80,19 +80,6 @@ const UsergroupNavBar = () => {
             문제
           </Link>
         </li>
-        <li style={liStyle}>
-          <Link
-            to={`/usergroups/${groupId}/edit`}
-            style={linkStyle}
-            onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                linkHoverStyle.backgroundColor)
-            }
-            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '')}
-          >
-            그룹 수정
-          </Link>
-        </li>
       </ul>
     </nav>
   );
