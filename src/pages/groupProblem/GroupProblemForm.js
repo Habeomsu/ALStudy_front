@@ -85,6 +85,11 @@ const GroupProblemForm = () => {
     }
   };
 
+  const handleUpdateProblem = (groupProblemId) => {
+    // 문제 수정 페이지로 이동
+    navigate(`/usergroups/${groupId}/update-problem/${groupProblemId}`);
+  };
+
   return (
     <div style={{ display: 'flex' }}>
       <UsergroupNavBar />
@@ -174,28 +179,45 @@ const GroupProblemForm = () => {
                   <span style={{ flex: 1 }}>
                     마감일: {new Date(problem.deadline).toLocaleString()}
                   </span>
-
                   <span style={{ flex: 1 }}>
                     감점: {problem.deductionAmount}
                   </span>
                   <span style={{ flex: 1 }}>상태: {problem.status}</span>
-                  {isLeader && ( // 리더일 경우에만 삭제 버튼 표시
-                    <button
-                      onClick={() =>
-                        handleDeleteProblem(problem.groupProblemId)
-                      }
-                      style={{
-                        marginLeft: '10px',
-                        padding: '5px 10px',
-                        backgroundColor: '#f44336',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      삭제
-                    </button>
+                  {isLeader && ( // 리더일 경우에만 업데이트 및 삭제 버튼 표시
+                    <>
+                      <button
+                        onClick={() =>
+                          handleUpdateProblem(problem.groupProblemId)
+                        }
+                        style={{
+                          marginLeft: '10px',
+                          padding: '5px 10px',
+                          backgroundColor: '#2196F3',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDeleteProblem(problem.groupProblemId)
+                        }
+                        style={{
+                          marginLeft: '10px',
+                          padding: '5px 10px',
+                          backgroundColor: '#f44336',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        삭제
+                      </button>
+                    </>
                   )}
                 </div>
               ))}
