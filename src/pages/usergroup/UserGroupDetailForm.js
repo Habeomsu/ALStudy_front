@@ -15,46 +15,62 @@ const UserGroupDetailWithMembersForm = () => {
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
   const [sort, setSort] = useState('desc');
+  const [isFetching, setIsFetching] = useState(false); // 요청 상태 관리
 
   useEffect(() => {
-    const fetchGroupDetails = async () => {
-      const url = `http://localhost:8080/groups/${groupId}`;
-      const response = await FetchAuthorizedPage(url, navigate, location);
-
-      if (response && response.isSuccess) {
-        setGroupData(response.result);
-      } else {
-        setError(response.message || '그룹 정보를 불러오는 데 실패했습니다.');
+    const fetchData = async () => {
+      setIsFetching(true); // 요청 시작
+      try {
+        await fetchGroupDetails();
+        await fetchMembers();
+        await fetchTodayProblems();
+      } catch (err) {
+        setError(err.message);
+        // 여기서 토큰 재발급 로직 추가 가능
+      } finally {
+        setIsFetching(false); // 요청 종료
       }
     };
 
-    const fetchMembers = async () => {
-      const url = `http://localhost:8080/usergroups/${groupId}/users?page=${page}&size=${size}&sort=${sort}`;
-      const response = await FetchAuthorizedPage(url, navigate, location);
-
-      if (response && response.isSuccess) {
-        setMembersData(response.result.usernameDtos);
-        setTotalElements(response.result.totalElements);
-      } else {
-        setError(response.message || '멤버 정보를 불러오는 데 실패했습니다.');
-      }
-    };
-
-    const fetchTodayProblems = async () => {
-      const url = `http://localhost:8080/groupproblem/${groupId}/todayProblem`;
-      const response = await FetchAuthorizedPage(url, navigate, location);
-
-      if (response && response.isSuccess) {
-        setTodayProblems(response.result.groupProblemResDtos);
-      } else {
-        setError(response.message || '오늘의 문제를 불러오는 데 실패했습니다.');
-      }
-    };
-
-    fetchGroupDetails();
-    fetchMembers();
-    fetchTodayProblems();
+    fetchData();
   }, [groupId, navigate, location, page, size, sort]);
+
+  const fetchGroupDetails = async () => {
+    const url = `http://localhost:8080/groups/${groupId}`;
+    const response = await FetchAuthorizedPage(url, navigate, location);
+    if (response && response.isSuccess) {
+      setGroupData(response.result);
+    } else {
+      throw new Error(
+        response.message || '그룹 정보를 불러오는 데 실패했습니다.'
+      );
+    }
+  };
+
+  const fetchMembers = async () => {
+    const url = `http://localhost:8080/usergroups/${groupId}/users?page=${page}&size=${size}&sort=${sort}`;
+    const response = await FetchAuthorizedPage(url, navigate, location);
+    if (response && response.isSuccess) {
+      setMembersData(response.result.usernameDtos);
+      setTotalElements(response.result.totalElements);
+    } else {
+      throw new Error(
+        response.message || '멤버 정보를 불러오는 데 실패했습니다.'
+      );
+    }
+  };
+
+  const fetchTodayProblems = async () => {
+    const url = `http://localhost:8080/groupproblem/${groupId}/todayProblem`;
+    const response = await FetchAuthorizedPage(url, navigate, location);
+    if (response && response.isSuccess) {
+      setTodayProblems(response.result.groupProblemResDtos);
+    } else {
+      throw new Error(
+        response.message || '오늘의 문제를 불러오는 데 실패했습니다.'
+      );
+    }
+  };
 
   const totalPages = Math.ceil(totalElements / size);
 
@@ -66,12 +82,11 @@ const UserGroupDetailWithMembersForm = () => {
         style={{
           display: 'flex',
           flex: 1,
-          marginLeft: '50px', // 사이드바 너비에 맞추어 여백 조정
+          marginLeft: '50px',
           flexDirection: 'column',
-          alignItems: 'center', // 중앙 정렬
+          alignItems: 'center',
         }}
       >
-        {/* 그룹 정보 영역 */}
         <div style={{ padding: '20px', textAlign: 'center' }}>
           {error && <div style={{ color: 'red' }}>{error}</div>}
 
@@ -89,12 +104,10 @@ const UserGroupDetailWithMembersForm = () => {
           )}
         </div>
 
-        {/* 그룹 정보와 데이터 공간 사이의 간격 추가 */}
         <div style={{ marginTop: '40px', display: 'flex', width: '100%' }}>
-          {/* 왼쪽 데이터 공간 */}
           <div
             style={{
-              flex: 1, // 공간을 균등하게 배분
+              flex: 1,
               padding: '20px',
               borderRight: '1px solid #ccc',
               textAlign: 'center',
@@ -133,15 +146,13 @@ const UserGroupDetailWithMembersForm = () => {
             )}
           </div>
 
-          {/* 오른쪽 멤버 목록 공간 */}
           <div
             style={{
-              flex: 1, // 공간을 균등하게 배분
+              flex: 1,
               padding: '20px',
               textAlign: 'center',
             }}
           >
-            {/* 멤버 목록 */}
             {membersData.length > 0 ? (
               <>
                 <h2>그룹 멤버 목록</h2>
@@ -150,7 +161,7 @@ const UserGroupDetailWithMembersForm = () => {
                     marginTop: '20px',
                     borderCollapse: 'collapse',
                     width: '80%',
-                    margin: '0 auto', // 중앙 정렬
+                    margin: '0 auto',
                   }}
                 >
                   <thead>
@@ -181,7 +192,6 @@ const UserGroupDetailWithMembersForm = () => {
                   </tbody>
                 </table>
 
-                {/* 페이지네이션 추가 */}
                 <div
                   style={{
                     marginTop: '20px',

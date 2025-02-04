@@ -7,78 +7,86 @@ const GroupProblemForm = () => {
   const { groupId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [problemData, setProblemData] = useState([]); // 그룹 문제 데이터
+  const [problemData, setProblemData] = useState([]);
   const [totalElements, setTotalElements] = useState(0);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
   const [sort, setSort] = useState('desc');
-  const [isLeader, setIsLeader] = useState(false); // 리더 여부 상태
-  const [groupData, setGroupData] = useState(null); // 그룹 데이터
+  const [isLeader, setIsLeader] = useState(false);
+  const [groupData, setGroupData] = useState(null);
+  const [isFetching, setIsFetching] = useState(false); // 요청 상태 관리
 
   useEffect(() => {
-    const fetchGroupDetails = async () => {
-      const url = `http://localhost:8080/groups/${groupId}`;
-      const response = await FetchAuthorizedPage(url, navigate, location);
-
-      if (response && response.isSuccess) {
-        setGroupData(response.result);
-
-        // 로컬 저장소에서 현재 사용자 이름 가져오기
-        const currentUserName = window.localStorage.getItem('name');
-
-        // 그룹 리더 이름과 비교하여 리더 여부 설정
-        if (currentUserName === response.result.username) {
-          setIsLeader(true);
-        }
-      } else {
-        setError(response.message || '그룹 정보를 불러오는 데 실패했습니다.');
+    const fetchData = async () => {
+      setIsFetching(true); // 요청 시작
+      try {
+        await fetchGroupDetails();
+        await fetchProblem();
+      } catch (err) {
+        setError(err.message);
+        // 여기에서 토큰 재발급 로직 추가 가능
+      } finally {
+        setIsFetching(false); // 요청 종료
       }
     };
 
-    const fetchProblem = async () => {
-      const url = `http://localhost:8080/groupproblem/${groupId}?page=${page}&size=${size}&sort=${sort}`; // 문제 API URL
-      const response = await FetchAuthorizedPage(url, navigate, location);
-
-      if (response && response.isSuccess) {
-        setProblemData(response.result.groupProblemResDtos); // 문제 정보 저장
-        setTotalElements(response.result.totalElements); // 전체 요소 수 저장
-      } else {
-        setError(response.message || '문제 정보를 불러오는 데 실패했습니다.');
-      }
-    };
-
-    fetchGroupDetails();
-    fetchProblem();
+    fetchData();
   }, [groupId, navigate, location, page, size, sort]);
+
+  const fetchGroupDetails = async () => {
+    const url = `http://localhost:8080/groups/${groupId}`;
+    const response = await FetchAuthorizedPage(url, navigate, location);
+    if (response && response.isSuccess) {
+      setGroupData(response.result);
+      const currentUserName = window.localStorage.getItem('name');
+      if (currentUserName === response.result.username) {
+        setIsLeader(true);
+      }
+    } else {
+      throw new Error(
+        response.message || '그룹 정보를 불러오는 데 실패했습니다.'
+      );
+    }
+  };
+
+  const fetchProblem = async () => {
+    const url = `http://localhost:8080/groupproblem/${groupId}?page=${page}&size=${size}&sort=${sort}`;
+    const response = await FetchAuthorizedPage(url, navigate, location);
+    if (response && response.isSuccess) {
+      setProblemData(response.result.groupProblemResDtos);
+      setTotalElements(response.result.totalElements);
+    } else {
+      throw new Error(
+        response.message || '문제 정보를 불러오는 데 실패했습니다.'
+      );
+    }
+  };
 
   const totalPages = Math.ceil(totalElements / size);
 
   const handleCreateProblem = () => {
-    // 문제 생성 페이지로 이동
     navigate(`/usergroups/${groupId}/create-problem`, { state: { groupId } });
   };
 
   const handleDeleteProblem = async (groupProblemId) => {
     const confirmDelete = window.confirm('정말로 이 문제를 삭제하시겠습니까?');
     if (confirmDelete) {
-      const url = `http://localhost:8080/groupproblem/${groupId}/${groupProblemId}`; // 수정된 문제 삭제 API URL
+      const url = `http://localhost:8080/groupproblem/${groupId}/${groupProblemId}`;
       const response = await FetchAuthorizedPage(
         url,
         navigate,
         location,
         'DELETE'
       );
-
       if (response && response.isSuccess) {
         alert('문제가 삭제되었습니다.');
-        // 문제 목록 갱신
         setProblemData(
           problemData.filter(
             (problem) => problem.groupProblemId !== groupProblemId
           )
         );
-        setTotalElements((prev) => prev - 1); // 전체 요소 수 감소
+        setTotalElements((prev) => prev - 1);
       } else {
         alert('문제 삭제에 실패했습니다.');
       }
@@ -86,28 +94,26 @@ const GroupProblemForm = () => {
   };
 
   const handleUpdateProblem = (groupProblemId) => {
-    // 문제 수정 페이지로 이동
     navigate(`/usergroups/${groupId}/update-problem/${groupProblemId}`);
   };
 
   return (
     <div style={{ display: 'flex' }}>
       <UsergroupNavBar />
-
       <div
         style={{
-          marginLeft: '40px', // 사이드바 너비에 맞추어 여백 조정
+          marginLeft: '40px',
           textAlign: 'center',
-          flex: 1, // 남은 공간을 차지하도록 설정
+          flex: 1,
           display: 'flex',
           flexDirection: 'column',
           padding: '20px',
-          alignItems: 'center', // 수평 중앙 정렬
+          alignItems: 'center',
         }}
       >
+        {isFetching && <div>로딩 중...</div>}
         {error && <div style={{ color: 'red' }}>{error}</div>}
 
-        {/* 문제 데이터가 있을 경우 */}
         {problemData.length > 0 ? (
           <>
             <div
@@ -119,7 +125,6 @@ const GroupProblemForm = () => {
               }}
             >
               <h1>그룹 문제 목록</h1>
-              {/* 문제 생성 버튼 (리더만 사용 가능) */}
               {isLeader && (
                 <button
                   onClick={handleCreateProblem}
@@ -154,7 +159,7 @@ const GroupProblemForm = () => {
                     borderRadius: '8px',
                     padding: '15px',
                     margin: '10px',
-                    width: '100%', // 박스 너비를 전체로 설정
+                    width: '100%',
                     boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
                   }}
                 >
@@ -162,8 +167,8 @@ const GroupProblemForm = () => {
                     to={`/usergroups/${groupId}/problems/${problem.groupProblemId}`}
                     style={{
                       flex: 1,
-                      textDecoration: 'underline', // 밑줄 추가
-                      color: 'blue', // 클릭 가능한 링크 스타일
+                      textDecoration: 'underline',
+                      color: 'blue',
                       cursor: 'pointer',
                     }}
                   >
@@ -182,7 +187,7 @@ const GroupProblemForm = () => {
                     감점: {problem.deductionAmount}
                   </span>
                   <span style={{ flex: 1 }}>상태: {problem.status}</span>
-                  {isLeader && ( // 리더일 경우에만 업데이트 및 삭제 버튼 표시
+                  {isLeader && (
                     <>
                       <button
                         onClick={() =>
@@ -222,7 +227,6 @@ const GroupProblemForm = () => {
               ))}
             </div>
 
-            {/* 페이지네이션 추가 */}
             <div
               style={{
                 marginTop: '20px',
