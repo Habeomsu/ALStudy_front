@@ -43,12 +43,13 @@ const GroupProblemDetailForm = () => {
       <UsergroupNavBar />
       <div
         style={{
-          marginLeft: '220px', // 사이드바 너비에 맞추어 여백 조정
-          padding: '20px',
+          marginLeft: '40px', // 사이드바 너비에 맞추어 여백 조정
+          textAlign: 'center',
           flex: 1, // 남은 공간을 차지하도록 설정
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
+          padding: '20px',
+          alignItems: 'center', // 수평 중앙 정렬
         }}
       >
         <GroupProblemButton />

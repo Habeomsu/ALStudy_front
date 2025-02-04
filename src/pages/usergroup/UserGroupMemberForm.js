@@ -7,7 +7,7 @@ const UserGroupMemberForm = () => {
   const { groupId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [membersData, setMembersData] = useState([]); // 멤버 데이터 상태
+  const [membersData, setMembersData] = useState([]);
   const [totalElements, setTotalElements] = useState(0);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
@@ -16,12 +16,12 @@ const UserGroupMemberForm = () => {
 
   useEffect(() => {
     const fetchMembers = async () => {
-      const url = `http://localhost:8080/usergroups/${groupId}/users?page=${page}&size=${size}&sort=${sort}`; // 멤버 API URL
+      const url = `http://localhost:8080/usergroups/${groupId}/users?page=${page}&size=${size}&sort=${sort}`;
       const response = await FetchAuthorizedPage(url, navigate, location);
 
       if (response && response.isSuccess) {
-        setMembersData(response.result.usernameDtos); // 멤버 정보 저장
-        setTotalElements(response.result.totalElements); // 전체 요소 수 저장
+        setMembersData(response.result.usernameDtos);
+        setTotalElements(response.result.totalElements);
       } else {
         setError(response.message || '멤버 정보를 불러오는 데 실패했습니다.');
       }
@@ -38,18 +38,17 @@ const UserGroupMemberForm = () => {
 
       <div
         style={{
-          marginLeft: '220px', // 사이드바 너비에 맞추어 여백 조정
-          padding: '20px',
+          marginLeft: '40px',
           textAlign: 'center',
-          flex: 1, // 남은 공간을 차지하도록 설정
+          flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center', // 수직 중앙 정렬
-          alignItems: 'center', // 수평 중앙 정렬
+          padding: '20px',
+          alignItems: 'center',
         }}
       >
         {error && <div style={{ color: 'red' }}>{error}</div>}
-        {/* 오류 메시지 표시 */}
+
         {membersData.length > 0 ? (
           <>
             <h1>그룹 멤버 목록</h1>
@@ -90,6 +89,7 @@ const UserGroupMemberForm = () => {
                 marginTop: '20px',
                 display: 'flex',
                 justifyContent: 'center',
+                alignItems: 'center', // 수직 중앙 정렬
               }}
             >
               <button
@@ -99,7 +99,7 @@ const UserGroupMemberForm = () => {
               >
                 이전
               </button>
-              <span>
+              <span style={{ margin: '0 10px' }}>
                 페이지 {page + 1} / {totalPages}
               </span>
               <button

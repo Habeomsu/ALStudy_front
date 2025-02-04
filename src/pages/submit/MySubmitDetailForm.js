@@ -55,7 +55,7 @@ const MySubmitDetailForm = () => {
       <UsergroupNavBar />
       <div
         style={{
-          marginLeft: '220px', // 사이드바 너비에 맞추어 여백 조정
+          marginLeft: '40px', // 사이드바 너비에 맞추어 여백 조정
           padding: '20px',
           flex: 1, // 남은 공간을 차지하도록 설정
           display: 'flex',

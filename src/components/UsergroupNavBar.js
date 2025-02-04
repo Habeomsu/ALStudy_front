@@ -11,9 +11,9 @@ const UsergroupNavBar = () => {
     padding: '15px',
     borderRadius: '5px',
     boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-    position: 'fixed',
-    height: '100%',
-    overflowY: 'auto',
+    position: 'static', // 고정 해제
+    height: '100vh', // 전체 화면 높이
+    overflowY: 'auto', // 스크롤 가능
   };
 
   const ulStyle = {

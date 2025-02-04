@@ -61,7 +61,7 @@ const OtherSubmitDetailForm = () => {
       <UsergroupNavBar />
       <div
         style={{
-          marginLeft: '220px',
+          marginLeft: '40px',
           padding: '20px',
           flex: 1,
           display: 'flex',

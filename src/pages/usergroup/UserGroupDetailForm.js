@@ -9,7 +9,7 @@ const UserGroupDetailWithMembersForm = () => {
   const location = useLocation();
   const [groupData, setGroupData] = useState(null);
   const [membersData, setMembersData] = useState([]);
-  const [todayProblems, setTodayProblems] = useState([]); // 오늘의 문제 상태 추가
+  const [todayProblems, setTodayProblems] = useState([]);
   const [error, setError] = useState(null);
   const [totalElements, setTotalElements] = useState(0);
   const [page, setPage] = useState(0);
@@ -41,11 +41,11 @@ const UserGroupDetailWithMembersForm = () => {
     };
 
     const fetchTodayProblems = async () => {
-      const url = `http://localhost:8080/groupproblem/${groupId}/todayProblem`; // 오늘의 문제 API URL
+      const url = `http://localhost:8080/groupproblem/${groupId}/todayProblem`;
       const response = await FetchAuthorizedPage(url, navigate, location);
 
       if (response && response.isSuccess) {
-        setTodayProblems(response.result.groupProblemResDtos); // 오늘의 문제 데이터 업데이트
+        setTodayProblems(response.result.groupProblemResDtos);
       } else {
         setError(response.message || '오늘의 문제를 불러오는 데 실패했습니다.');
       }
@@ -53,7 +53,7 @@ const UserGroupDetailWithMembersForm = () => {
 
     fetchGroupDetails();
     fetchMembers();
-    fetchTodayProblems(); // 오늘의 문제 가져오기
+    fetchTodayProblems();
   }, [groupId, navigate, location, page, size, sort]);
 
   const totalPages = Math.ceil(totalElements / size);
@@ -66,8 +66,9 @@ const UserGroupDetailWithMembersForm = () => {
         style={{
           display: 'flex',
           flex: 1,
-          marginLeft: '220px', // 사이드바 너비에 맞추어 여백 조정
-          flexDirection: 'column', // 세로 방향으로 쌓이도록 설정
+          marginLeft: '50px', // 사이드바 너비에 맞추어 여백 조정
+          flexDirection: 'column',
+          alignItems: 'center', // 중앙 정렬
         }}
       >
         {/* 그룹 정보 영역 */}
@@ -89,13 +90,13 @@ const UserGroupDetailWithMembersForm = () => {
         </div>
 
         {/* 그룹 정보와 데이터 공간 사이의 간격 추가 */}
-        <div style={{ marginTop: '40px', display: 'flex', flex: 1 }}>
+        <div style={{ marginTop: '40px', display: 'flex', width: '100%' }}>
           {/* 왼쪽 데이터 공간 */}
           <div
             style={{
-              width: '50%', // 왼쪽 공간의 너비
+              flex: 1, // 공간을 균등하게 배분
               padding: '20px',
-              borderRight: '1px solid #ccc', // 구분선
+              borderRight: '1px solid #ccc',
               textAlign: 'center',
             }}
           >
@@ -135,7 +136,7 @@ const UserGroupDetailWithMembersForm = () => {
           {/* 오른쪽 멤버 목록 공간 */}
           <div
             style={{
-              width: '50%', // 오른쪽 공간의 너비
+              flex: 1, // 공간을 균등하게 배분
               padding: '20px',
               textAlign: 'center',
             }}
@@ -149,6 +150,7 @@ const UserGroupDetailWithMembersForm = () => {
                     marginTop: '20px',
                     borderCollapse: 'collapse',
                     width: '80%',
+                    margin: '0 auto', // 중앙 정렬
                   }}
                 >
                   <thead>
