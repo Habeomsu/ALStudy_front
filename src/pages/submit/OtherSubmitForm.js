@@ -89,7 +89,7 @@ const OtherSubmitForm = () => {
                       </td>
                       <td style={cellStyle}>{otherSubmission.username}</td>
                       <td style={cellStyle}>{otherSubmission.title}</td>
-                      <td style={cellStyle}>{otherSubmission.status}</td>
+                      <td style={cellStyle}>SUCCEEDED</td>
                       <td style={cellStyle}>
                         {new Date(
                           otherSubmission.submissionTime
