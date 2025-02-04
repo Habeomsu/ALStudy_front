@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import UsergroupNavBar from '../../components/UsergroupNavBar';
 import GroupProblemButton from '../../components/GroupProblemButton';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import FetchAuthorizedPage from '../../service/FetchAuthorizedPage'; // 기존 Fetch 함수 사용
+import FetchAuthorizedPage from '../../service/FetchAuthorizedPage';
 
-const MySubmitForm = () => {
+const OtherSubmitForm = () => {
   const { groupId, groupProblemId } = useParams(); // URL 파라미터에서 그룹 ID와 문제 ID 가져오기
   const navigate = useNavigate();
   const location = useLocation();
-  const [submissions, setSubmissions] = useState([]); // 제출 목록 상태
+  const [otherSubmissions, setOtherSubmissions] = useState([]); // 제출 목록 상태
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [error, setError] = useState(null); // 오류 메시지 상태
   const [page, setPage] = useState(0); // 현재 페이지
@@ -16,21 +16,21 @@ const MySubmitForm = () => {
   const [totalElements, setTotalElements] = useState(0); // 전체 요소 수
 
   useEffect(() => {
-    const fetchSubmissions = async () => {
-      const url = `http://localhost:8080/submission/${groupProblemId}?page=${page}&size=${size}`; // API URL에 페이지와 크기 추가
+    const fetchOtherSubmissions = async () => {
+      const url = `http://localhost:8080/submission/others/${groupProblemId}?page=${page}&size=${size}`; // API URL
       try {
         const data = await FetchAuthorizedPage(url, navigate, location, 'GET'); // FetchAuthorizedPage 사용
 
         // API 응답 확인 및 submissions 설정
-        if (data.result && Array.isArray(data.result.submissionResDtos)) {
-          setSubmissions(data.result.submissionResDtos); // 제출 목록 설정
+        if (data.result && Array.isArray(data.result.otherSubmissionResDtos)) {
+          setOtherSubmissions(data.result.otherSubmissionResDtos); // 제출 목록 설정
           setTotalElements(data.result.totalElements); // 전체 요소 수 설정
         } else {
           console.error(
             'Expected an array but got:',
-            data.result?.submissionResDtos
+            data.result?.otherSubmissionResDtos
           );
-          setSubmissions([]); // 빈 배열로 초기화
+          setOtherSubmissions([]); // 빈 배열로 초기화
         }
       } catch (err) {
         setError('제출 목록을 가져오는데 실패했습니다.');
@@ -39,7 +39,7 @@ const MySubmitForm = () => {
       }
     };
 
-    fetchSubmissions();
+    fetchOtherSubmissions();
   }, [groupProblemId, navigate, location, page, size]); // 페이지와 크기 추가
 
   const totalPages = Math.ceil(totalElements / size); // 총 페이지 수 계산
@@ -63,7 +63,7 @@ const MySubmitForm = () => {
           <div>로딩 중...</div>
         ) : (
           <>
-            <h2>내 제출 목록</h2>
+            <h2>그룹원 제출 목록</h2>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr>
@@ -76,24 +76,26 @@ const MySubmitForm = () => {
                 </tr>
               </thead>
               <tbody>
-                {submissions.length > 0 ? (
-                  submissions.map((submission) => (
-                    <tr key={submission.id} style={rowStyle}>
+                {otherSubmissions.length > 0 ? (
+                  otherSubmissions.map((otherSubmission) => (
+                    <tr key={otherSubmission.id} style={rowStyle}>
                       <td style={cellStyle}>
                         <Link
-                          to={`/usergroups/${groupId}/my-submit/${groupProblemId}/${submission.id}`}
+                          to={`/usergroups/${groupId}/other-submit/${groupProblemId}/${otherSubmission.id}`}
                         >
-                          {submission.id}
+                          {otherSubmission.id}
                         </Link>{' '}
                         {/* 제출 ID를 링크로 만들기 */}
                       </td>
-                      <td style={cellStyle}>{submission.username}</td>
-                      <td style={cellStyle}>{submission.title}</td>
-                      <td style={cellStyle}>{submission.status}</td>
+                      <td style={cellStyle}>{otherSubmission.username}</td>
+                      <td style={cellStyle}>{otherSubmission.title}</td>
+                      <td style={cellStyle}>{otherSubmission.status}</td>
                       <td style={cellStyle}>
-                        {new Date(submission.submissionTime).toLocaleString()}
+                        {new Date(
+                          otherSubmission.submissionTime
+                        ).toLocaleString()}
                       </td>
-                      <td style={cellStyle}>{submission.language}</td>
+                      <td style={cellStyle}>{otherSubmission.language}</td>
                     </tr>
                   ))
                 ) : (
@@ -148,4 +150,4 @@ const cellStyle = {
   padding: '10px',
 };
 
-export default MySubmitForm;
+export default OtherSubmitForm;

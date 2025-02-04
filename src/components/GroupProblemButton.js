@@ -43,7 +43,9 @@ const GroupProblemButton = () => {
       </button>
       <button
         onClick={() =>
-          handleNavigate(`/usergroups/${groupId}/group-submissions`)
+          handleNavigate(
+            `/usergroups/${groupId}/other-submit/${groupProblemId}`
+          )
         }
         style={buttonStyle}
       >
