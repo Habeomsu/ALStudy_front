@@ -31,6 +31,7 @@ const LoginForm = () => {
         window.localStorage.setItem('access', response.headers.get('access'));
         window.localStorage.setItem('name', result.username);
         window.localStorage.setItem('role', result.role);
+        window.localStorage.setItem('customerId', result.customerId);
 
         setIsLoggedIn(true);
         setLoginUser(result.username);

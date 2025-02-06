@@ -18,6 +18,7 @@ const LogoutForm = () => {
         window.localStorage.removeItem('access');
         window.localStorage.removeItem('name');
         window.localStorage.removeItem('role');
+        window.localStorage.removeItem('customerId');
 
         setIsLoggedIn(false);
         setLoginUser(null);
