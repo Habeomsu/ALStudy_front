@@ -25,6 +25,9 @@ import MySubmitForm from '../pages/submit/MySubmitForm';
 import MySubmitDetailForm from '../pages/submit/MySubmitDetailForm';
 import OtherSubmitForm from '../pages/submit/OtherSubmitForm';
 import OtherSubmitDetailForm from '../pages/submit/OtherSubmitDetailForm';
+import { CheckoutForm, CheckoutPage } from '../pages/payment/CheckOutForm';
+import { SuccessForm } from '../pages/payment/SuccessForm';
+import { FailForm } from '../pages/payment/FailForm';
 const MyRoutes = () => {
   const { isLoggedIn, role } = useLogin();
   // 로그인 여부에 따라서 조건부 라우팅
@@ -108,6 +111,13 @@ const MyRoutes = () => {
             path="/usergroups/:groupId/other-submit/:groupProblemId/:otherSubmissionId"
             element={<OtherSubmitDetailForm />}
           />
+          {/* 결제 관련 라우트 */}
+          <Route
+            path="/payment/checkout/:userGroupId"
+            element={<CheckoutForm />}
+          />
+          <Route path="/payment/success" element={<SuccessForm />} />
+          <Route path="/payment/fail" element={<FailForm />} />
         </>
       )}
     </Routes>

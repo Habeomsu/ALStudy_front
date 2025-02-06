@@ -55,6 +55,13 @@ const UserGroupForm = () => {
     }
   };
 
+  const handleCharge = (userGroupId, groupDepositAmount) => {
+    // 충전하기 버튼 클릭 시 결제 페이지로 이동
+    navigate(
+      `/payment/checkout/${userGroupId}?depositAmount=${groupDepositAmount}`
+    );
+  };
+
   return (
     <div
       style={{
@@ -117,6 +124,7 @@ const UserGroupForm = () => {
                     >
                       {group.groupName}
                     </Link>
+                    <span> 그룹 예치금: {group.groupDepositAmount} /</span>
                     <span> 남은 예치금: {group.userDepositAmount}</span>
                     <div>
                       <span>
@@ -125,19 +133,36 @@ const UserGroupForm = () => {
                       </span>
                     </div>
                   </div>
-                  <button
-                    onClick={() => resignGroup(group.groupId)}
-                    style={{
-                      backgroundColor: '#f44336',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '5px',
-                      cursor: 'pointer',
-                      marginLeft: '15px',
-                    }}
-                  >
-                    탈퇴
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <button
+                      onClick={() =>
+                        handleCharge(group.id, group.groupDepositAmount)
+                      }
+                      style={{
+                        backgroundColor: '#4CAF50',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        marginLeft: '15px',
+                      }}
+                    >
+                      충전하기
+                    </button>
+                    <button
+                      onClick={() => resignGroup(group.groupId)}
+                      style={{
+                        backgroundColor: '#f44336',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        marginLeft: '15px',
+                      }}
+                    >
+                      탈퇴
+                    </button>
+                  </div>
                 </div>
               </li>
             ))
