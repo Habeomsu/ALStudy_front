@@ -62,7 +62,7 @@ export function FailForm() {
           navigate(`/usergroups`); // navigate 함수를 사용하여 유저 그룹 페이지로 이동
         }}
       >
-        유저 그룹 페이지로 돌아가기
+        이전 페이지로 돌아가기
       </button>
     </div>
   );

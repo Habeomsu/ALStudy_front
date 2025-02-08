@@ -11,20 +11,20 @@ const UserGroupForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const getGroups = async () => {
+    const url = `http://localhost:8080/usergroups?page=${page}&size=${size}&sort=${sort}`; // API URL
+    const groupsData = await FetchAuthorizedPage(url, navigate, location);
+
+    if (groupsData && groupsData.isSuccess) {
+      setUserGroups(groupsData.result.userGroupsResDtos); // 그룹 데이터가 있는 배열로 업데이트
+      setTotalElements(groupsData.result.totalElements); // 전체 요소 수 업데이트
+    } else {
+      setUserGroups([]);
+      setTotalElements(0);
+    }
+  };
+
   useEffect(() => {
-    const getGroups = async () => {
-      const url = `http://localhost:8080/usergroups?page=${page}&size=${size}&sort=${sort}`; // API URL
-      const groupsData = await FetchAuthorizedPage(url, navigate, location);
-
-      if (groupsData && groupsData.isSuccess) {
-        setUserGroups(groupsData.result.userGroupsResDtos); // 그룹 데이터가 있는 배열로 업데이트
-        setTotalElements(groupsData.result.totalElements); // 전체 요소 수 업데이트
-      } else {
-        setUserGroups([]);
-        setTotalElements(0);
-      }
-    };
-
     getGroups();
   }, [navigate, location, page, size, sort]); // 의존성 배열에 필요한 값 추가
 
@@ -51,6 +51,30 @@ const UserGroupForm = () => {
         setTotalElements((prev) => prev - 1); // 전체 요소 수 감소
       } else {
         alert('그룹 탈퇴에 실패했습니다.'); // 오류 메시지
+      }
+    }
+  };
+
+  // 환급하기 함수
+  const handleRefund = async (userGroupId) => {
+    const confirmRefund = window.confirm('환급 요청을 하시겠습니까?');
+    if (confirmRefund) {
+      const url = `http://localhost:8080/payment/refund/${userGroupId}`; // 환급 API URL
+      const response = await FetchAuthorizedPage(
+        url,
+        navigate,
+        location,
+        'GET'
+      );
+
+      if (response && response.isSuccess) {
+        alert('환급 요청이 완료되었습니다.');
+        // 그룹 목록 업데이트 (예: 환급 후 사용자 그룹 리스트를 새로고침)
+        getGroups(); // 그룹 목록 다시 가져오기
+      } else {
+        // 에러 메시지 가져오기
+        const errorMessage = response?.message || '환급 요청에 실패했습니다.';
+        alert(`환급 요청에 실패했습니다: ${errorMessage}`); // 오류 메시지
       }
     }
   };
@@ -112,9 +136,9 @@ const UserGroupForm = () => {
                     border: '1px solid #ddd',
                     borderRadius: '5px',
                     backgroundColor: '#f9f9f9',
-                    display: 'flex', // 플렉스 박스 사용
-                    justifyContent: 'space-between', // 양쪽 끝으로 정렬
-                    alignItems: 'center', // 수직 정렬
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
                   }}
                 >
                   <div>
@@ -148,6 +172,20 @@ const UserGroupForm = () => {
                       }}
                     >
                       충전하기
+                    </button>
+
+                    <button
+                      onClick={() => handleRefund(group.id)} // 환급 버튼 추가
+                      style={{
+                        backgroundColor: '#2196F3',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        marginLeft: '15px',
+                      }}
+                    >
+                      환급하기
                     </button>
                     <button
                       onClick={() => resignGroup(group.groupId)}
