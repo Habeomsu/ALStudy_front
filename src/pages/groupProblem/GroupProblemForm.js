@@ -114,147 +114,116 @@ const GroupProblemForm = () => {
         {isFetching && <div>로딩 중...</div>}
         {error && <div style={{ color: 'red' }}>{error}</div>}
 
-        {problemData.length > 0 ? (
-          <>
-            <div
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            width: '80%',
+            alignItems: 'center',
+          }}
+        >
+          <h1>그룹 문제 목록</h1>
+          {isLeader && (
+            <button
+              onClick={handleCreateProblem}
               style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                width: '80%',
-                alignItems: 'center',
+                padding: '10px 20px',
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
               }}
             >
-              <h1>그룹 문제 목록</h1>
-              {isLeader && (
-                <button
-                  onClick={handleCreateProblem}
+              문제 생성
+            </button>
+          )}
+        </div>
+
+        {problemData.length > 0 ? (
+          <div
+            style={{
+              width: '80%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            {problemData.map((problem) => (
+              <div
+                key={problem.groupProblemId}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  border: '1px solid #ccc',
+                  borderRadius: '8px',
+                  padding: '15px',
+                  margin: '10px',
+                  width: '100%',
+                  boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+                }}
+              >
+                <Link
+                  to={`/usergroups/${groupId}/problems/${problem.groupProblemId}`}
                   style={{
-                    padding: '10px 20px',
-                    backgroundColor: '#4CAF50',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
+                    flex: 1,
+                    textDecoration: 'underline',
+                    color: 'blue',
                     cursor: 'pointer',
                   }}
                 >
-                  문제 생성
-                </button>
-              )}
-            </div>
-            <div
-              style={{
-                width: '80%',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              {problemData.map((problem) => (
-                <div
-                  key={problem.groupProblemId}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    border: '1px solid #ccc',
-                    borderRadius: '8px',
-                    padding: '15px',
-                    margin: '10px',
-                    width: '100%',
-                    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
-                  }}
-                >
-                  <Link
-                    to={`/usergroups/${groupId}/problems/${problem.groupProblemId}`}
-                    style={{
-                      flex: 1,
-                      textDecoration: 'underline',
-                      color: 'blue',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    문제: {problem.title}
-                  </Link>
-                  <span style={{ flex: 1 }}>
-                    난이도: {problem.difficultyLevel}
-                  </span>
-                  <span style={{ flex: 1 }}>
-                    작성일: {new Date(problem.createdAt).toLocaleString()}
-                  </span>
-                  <span style={{ flex: 1 }}>
-                    마감일: {new Date(problem.deadline).toLocaleString()}
-                  </span>
-                  <span style={{ flex: 1 }}>
-                    감점: {problem.deductionAmount}
-                  </span>
-                  <span style={{ flex: 1 }}>상태: {problem.status}</span>
-                  {isLeader && (
-                    <>
-                      <button
-                        onClick={() =>
-                          handleUpdateProblem(problem.groupProblemId)
-                        }
-                        style={{
-                          marginLeft: '10px',
-                          padding: '5px 10px',
-                          backgroundColor: '#2196F3',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        수정
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleDeleteProblem(problem.groupProblemId)
-                        }
-                        style={{
-                          marginLeft: '10px',
-                          padding: '5px 10px',
-                          backgroundColor: '#f44336',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        삭제
-                      </button>
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div
-              style={{
-                marginTop: '20px',
-                display: 'flex',
-                justifyContent: 'center',
-              }}
-            >
-              <button
-                onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
-                disabled={page === 0}
-                style={{ marginRight: '10px' }}
-              >
-                이전
-              </button>
-              <span>
-                페이지 {page + 1} / {totalPages}
-              </span>
-              <button
-                onClick={() =>
-                  setPage((prev) => Math.min(prev + 1, totalPages - 1))
-                }
-                disabled={page >= totalPages - 1}
-                style={{ marginLeft: '10px' }}
-              >
-                다음
-              </button>
-            </div>
-          </>
+                  문제: {problem.title}
+                </Link>
+                <span style={{ flex: 1 }}>
+                  난이도: {problem.difficultyLevel}
+                </span>
+                <span style={{ flex: 1 }}>
+                  작성일: {new Date(problem.createdAt).toLocaleString()}
+                </span>
+                <span style={{ flex: 1 }}>
+                  마감일: {new Date(problem.deadline).toLocaleString()}
+                </span>
+                <span style={{ flex: 1 }}>감점: {problem.deductionAmount}</span>
+                <span style={{ flex: 1 }}>상태: {problem.status}</span>
+                {isLeader && (
+                  <>
+                    <button
+                      onClick={() =>
+                        handleUpdateProblem(problem.groupProblemId)
+                      }
+                      style={{
+                        marginLeft: '10px',
+                        padding: '5px 10px',
+                        backgroundColor: '#2196F3',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      수정
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleDeleteProblem(problem.groupProblemId)
+                      }
+                      style={{
+                        marginLeft: '10px',
+                        padding: '5px 10px',
+                        backgroundColor: '#f44336',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      삭제
+                    </button>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
         ) : (
           <div>문제 정보가 없습니다.</div>
         )}
