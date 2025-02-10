@@ -8,15 +8,14 @@ import './PaymentStyle.css';
 // @docs https://docs.tosspayments.com/sdk/v2/js#토스페이먼츠-초기화
 const clientKey = 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm';
 const customerKey = localStorage.getItem('customerId');
+const username = localStorage.getItem('name');
 
-export function CheckoutForm() {
-  const { userGroupId } = useParams(); // URL 파라미터에서 userGroupId 가져오기
+export function GroupCheckoutForm() {
   const location = useLocation(); // 쿼리 파라미터를 가져오기 위해 useLocation 사용
-  const query = new URLSearchParams(location.search);
-  const depositAmount = query.get('depositAmount');
+  const groupData = location.state;
   const [amount, setAmount] = useState({
     currency: 'KRW',
-    value: depositAmount ? Number(depositAmount) : 10000,
+    value: groupData.depositAmount,
   });
   const [ready, setReady] = useState(false);
   const [widgets, setWidgets] = useState(null);
@@ -92,33 +91,6 @@ export function CheckoutForm() {
         {/* 이용약관 UI */}
         <div id="agreement" />
         {/* 쿠폰 체크박스 */}
-        <div style={{ paddingLeft: '24px' }}>
-          <div className="checkable typography--p">
-            <label
-              htmlFor="coupon-box"
-              className="checkable__label typography--regular"
-            >
-              <input
-                id="coupon-box"
-                className="checkable__input"
-                type="checkbox"
-                aria-checked="true"
-                disabled={!ready}
-                // ------  주문서의 결제 금액이 변경되었을 경우 결제 금액 업데이트 ------
-                // @docs https://docs.tosspayments.com/sdk/v2/js#widgetssetamount
-                onChange={async (event) => {
-                  await updateAmount({
-                    currency: amount.currency,
-                    value: event.target.checked
-                      ? amount.value - 5000
-                      : amount.value + 5000,
-                  });
-                }}
-              />
-              <span className="checkable__label-text">5,000원 쿠폰 적용</span>
-            </label>
-          </div>
-        </div>
 
         {/* 결제하기 버튼 */}
         <button
@@ -133,14 +105,22 @@ export function CheckoutForm() {
               // 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
               await widgets.requestPayment({
                 orderId: generateRandomString(),
-                orderName: '예치금 충전',
+                orderName: '그룹 생성',
                 successUrl:
                   window.location.origin +
-                  `/payment/success?userGroupId=${userGroupId}`,
-                failUrl: window.location.origin + '/payment/fail',
-                customerEmail: 'customer123@gmail.com',
-                customerName: '김토스',
-                customerMobilePhone: '01012341234',
+                  `/payment/group/success?groupname=${encodeURIComponent(
+                    groupData.groupname
+                  )}&password=${encodeURIComponent(
+                    groupData.password
+                  )}&depositAmount=${
+                    groupData.depositAmount
+                  }&deadline=${encodeURIComponent(
+                    groupData.deadline
+                  )}&studyEndDate=${encodeURIComponent(
+                    groupData.studyEndDate
+                  )}`,
+                failUrl: window.location.origin + '/payment/group/fail',
+                customerName: username,
               });
             } catch (error) {
               // 에러 처리하기

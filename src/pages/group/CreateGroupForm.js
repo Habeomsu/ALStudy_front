@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import FetchAuthorizedPage from '../../service/FetchAuthorizedPage';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const CreateGroupForm = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   // 상태 변수 설정
   const [groupname, setGroupname] = useState('');
@@ -13,7 +11,7 @@ const CreateGroupForm = () => {
   const [deadline, setDeadline] = useState('');
   const [studyEndDate, setStudyEndDate] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault(); // 기본 폼 제출 방지
 
     const groupData = {
@@ -24,31 +22,8 @@ const CreateGroupForm = () => {
       studyEndDate,
     };
 
-    // API 요청을 위한 URL
-    const url = 'http://localhost:8080/groups'; // 실제 API 경로로 변경 필요
-
-    // FetchAuthorizedPage를 사용하여 데이터 전송
-    const response = await FetchAuthorizedPage(
-      url,
-      navigate,
-      location,
-      'POST',
-      groupData
-    );
-
-    if (!response) {
-      alert('문제가 발생했습니다. 다시 시도해 주세요.');
-      return; // 에러가 발생했을 경우, 이후 코드를 실행하지 않도록 종료
-    }
-
-    // 응답이 성공적인지 확인
-    if (!response.isSuccess) {
-      alert('그룹 생성 실패: ' + response.message); // 사용자에게 알림
-      return; // 에러가 발생했을 경우, 이후 코드를 실행하지 않도록 종료
-    }
-
-    alert('그룹이 성공적으로 생성되었습니다!');
-    navigate('/groups'); // 그룹 목록 페이지로 이동
+    // 결제 페이지로 그룹 데이터와 함께 이동
+    navigate('/payment/group/checkout', { state: groupData });
   };
 
   const increaseDeposit = () => {
