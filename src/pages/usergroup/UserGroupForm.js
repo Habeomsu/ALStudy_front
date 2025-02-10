@@ -50,7 +50,7 @@ const UserGroupForm = () => {
         setUserGroups(usergroups.filter((group) => group.groupId !== groupId));
         setTotalElements((prev) => prev - 1); // 전체 요소 수 감소
       } else {
-        alert('그룹 탈퇴에 실패했습니다.'); // 오류 메시지
+        alert(`그룹 탈퇴에 실패했습니다: ${response.message}`); // 오류 메시지
       }
     }
   };
