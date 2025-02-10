@@ -8,25 +8,29 @@ const GroupsForm = () => {
   const [size, setSize] = useState(10);
   const [sort, setSort] = useState('asc');
   const [totalElements, setTotalElements] = useState(0);
+  const [searchTerm, setSearchTerm] = useState(''); // 검색어 상태 추가
   const navigate = useNavigate();
   const location = useLocation();
 
+  // 그룹을 가져오는 함수
+  const getGroups = async () => {
+    const url = `http://localhost:8080/groups?page=${page}&size=${size}&sort=${sort}&search=${encodeURIComponent(
+      searchTerm
+    )}`; // API URL에 검색어 추가
+    const groupsData = await FetchAuthorizedPage(url, navigate, location);
+
+    if (groupsData && groupsData.isSuccess) {
+      setGroups(groupsData.result.groupResDtos); // 그룹 데이터가 있는 배열로 업데이트
+      setTotalElements(groupsData.result.totalElements); // 전체 요소 수 업데이트
+    } else {
+      setGroups([]);
+      setTotalElements(0);
+    }
+  };
+
   useEffect(() => {
-    const getGroups = async () => {
-      const url = `http://localhost:8080/groups?page=${page}&size=${size}&sort=${sort}`; // API URL
-      const groupsData = await FetchAuthorizedPage(url, navigate, location);
-
-      if (groupsData && groupsData.isSuccess) {
-        setGroups(groupsData.result.groupResDtos); // 그룹 데이터가 있는 배열로 업데이트
-        setTotalElements(groupsData.result.totalElements); // 전체 요소 수 업데이트
-      } else {
-        setGroups([]);
-        setTotalElements(0);
-      }
-    };
-
-    getGroups();
-  }, [navigate, location, page, size, sort]); // 의존성 배열에 필요한 값 추가
+    getGroups(); // 컴포넌트가 마운트될 때 그룹 가져오기
+  }, [navigate, location, page, size, sort, searchTerm]); // 의존성 배열에 searchTerm 추가
 
   const totalPages = Math.ceil(totalElements / size);
 
@@ -49,7 +53,6 @@ const GroupsForm = () => {
           setGroups(groups.filter((group) => group.id !== groupId)); // 삭제된 그룹을 목록에서 제거
           setTotalElements((prev) => prev - 1); // 전체 요소 수 감소
         } else {
-          // response가 null이 아닐 경우에만 message에 접근
           alert(
             `그룹 삭제에 실패했습니다. ${
               response.message || '알 수 없는 오류가 발생했습니다.'
@@ -60,6 +63,12 @@ const GroupsForm = () => {
         alert('서버와의 연결에 문제가 발생했습니다.');
       }
     }
+  };
+
+  // 검색 함수
+  const handleSearch = () => {
+    setPage(0); // 검색 시 첫 페이지로 이동
+    getGroups(); // 검색어로 그룹 가져오기
   };
 
   return (
@@ -88,13 +97,13 @@ const GroupsForm = () => {
           <Link to="/create-group">
             <button
               style={{
-                padding: '10px 20px', // 패딩 조정
-                fontSize: '16px', // 폰트 크기 조정
-                backgroundColor: '#4CAF50', // 버튼 색상
-                color: 'white', // 텍스트 색상
-                border: 'none', // 기본 테두리 제거
-                borderRadius: '5px', // 둥근 모서리
-                cursor: 'pointer', // 마우스 커서 변경
+                padding: '10px 20px',
+                fontSize: '16px',
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
               }}
             >
               그룹 생성
@@ -103,7 +112,19 @@ const GroupsForm = () => {
         </div>
 
         <div style={{ marginBottom: '20px', textAlign: 'right' }}>
-          <label>페이지 크기:</label>
+          <label>검색:</label>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="그룹 이름 검색"
+            style={{ marginLeft: '10px', marginRight: '10px' }}
+          />
+          <button onClick={handleSearch} style={{ padding: '5px 10px' }}>
+            검색
+          </button>
+
+          <label style={{ marginLeft: '20px' }}>페이지 크기:</label>
           <select
             value={size}
             onChange={(e) => setSize(Number(e.target.value))}
@@ -130,9 +151,9 @@ const GroupsForm = () => {
                     border: '1px solid #ddd',
                     borderRadius: '5px',
                     backgroundColor: '#f9f9f9',
-                    display: 'flex', // 플렉스 박스 사용
-                    justifyContent: 'space-between', // 양쪽 끝으로 정렬
-                    alignItems: 'center', // 수직 정렬
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
                   }}
                 >
                   <div>
@@ -151,19 +172,19 @@ const GroupsForm = () => {
                       <span>
                         {' '}
                         | 스터디 종료 기간:{' '}
-                        {new Date(group.stutyEndDate).toLocaleString()}
+                        {new Date(group.studyEndDate).toLocaleString()}
                       </span>
                     </div>
                   </div>
                   <button
                     onClick={() => handleDeleteGroup(group.id)}
                     style={{
-                      backgroundColor: '#f44336', // 삭제 버튼 색상
+                      backgroundColor: '#f44336',
                       color: 'white',
                       border: 'none',
                       borderRadius: '5px',
                       cursor: 'pointer',
-                      marginLeft: '15px', // 버튼 사이 마진
+                      marginLeft: '15px',
                     }}
                   >
                     삭제
