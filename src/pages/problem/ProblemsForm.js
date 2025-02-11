@@ -15,6 +15,7 @@ const ProblemsForm = () => {
   const [size, setSize] = useState(10);
   const [sort, setSort] = useState('desc');
   const [type, setType] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(''); // 검색어 상태 추가
   const [totalElements, setTotalElements] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,7 +32,8 @@ const ProblemsForm = () => {
           page,
           size,
           sort,
-          type // type이 null일 경우 아예 경로에서 제외됨
+          type, // type이 null일 경우 아예 경로에서 제외됨
+          searchTerm // 검색어 추가
         );
 
         if (problemsData && Array.isArray(problemsData.result.problemResDtos)) {
@@ -45,9 +47,35 @@ const ProblemsForm = () => {
     };
 
     getProblems();
-  }, [navigate, location, page, size, sort, type]); // 의존성 배열에 page, size, sort, type 추가
+  }, [navigate, location, page, size, sort, type, searchTerm]); // 의존성 배열에 searchTerm 추가
 
   const totalPages = Math.ceil(totalElements / size);
+
+  const handleSearch = () => {
+    setPage(0); // 검색 시 첫 페이지로 이동
+    // API 요청을 위한 추가적인 로직이 필요할 수 있음
+    const getProblems = async () => {
+      const problemsData = await fetchProblems(
+        navigate,
+        location,
+        0, // 페이지를 0으로 초기화
+        size,
+        sort,
+        type,
+        searchTerm // 검색어 전달
+      );
+
+      if (problemsData && Array.isArray(problemsData.result.problemResDtos)) {
+        setProblems(problemsData.result.problemResDtos);
+        setTotalElements(problemsData.result.totalElements);
+      } else {
+        setProblems([]);
+        setTotalElements(0);
+      }
+    };
+
+    getProblems();
+  };
 
   return (
     <div
@@ -76,13 +104,13 @@ const ProblemsForm = () => {
             <Link to="/create-problem">
               <button
                 style={{
-                  padding: '10px 20px', // 패딩 조정
-                  fontSize: '16px', // 폰트 크기 조정
-                  backgroundColor: '#4CAF50', // 버튼 색상
-                  color: 'white', // 텍스트 색상
-                  border: 'none', // 기본 테두리 제거
-                  borderRadius: '5px', // 둥근 모서리
-                  cursor: 'pointer', // 마우스 커서 변경
+                  padding: '10px 20px',
+                  fontSize: '16px',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
                 }}
               >
                 문제 생성
@@ -90,6 +118,7 @@ const ProblemsForm = () => {
             </Link>
           </div>
         )}
+
         <div
           style={{
             display: 'flex',
@@ -117,7 +146,7 @@ const ProblemsForm = () => {
             </select>
           </div>
 
-          <div>
+          <div style={{ marginRight: '20px' }}>
             <label>문제 유형:</label>
             <select
               value={type === null ? 'ALL' : type}
@@ -137,6 +166,20 @@ const ProblemsForm = () => {
               <option value="DIVIDE_AND_CONQUER">분할 정복</option>
               <option value="BRUTE_FORCE">완전 탐색</option>
             </select>
+          </div>
+
+          <div style={{ marginRight: '20px' }}>
+            <label>검색:</label>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)} // 검색어 상태 업데이트
+              placeholder="문제 제목 검색"
+              style={{ marginLeft: '10px' }}
+            />
+            <button onClick={handleSearch} style={{ marginLeft: '10px' }}>
+              검색
+            </button>
           </div>
         </div>
 
