@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Client } from '@stomp/stompjs';
 import UsergroupNavBar from '../../components/UsergroupNavBar';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import FetchAuthorizedPage from '../../service/FetchAuthorizedPage';
@@ -8,32 +9,59 @@ const UserGroupDetailWithMembersForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [groupData, setGroupData] = useState(null);
-  const [membersData, setMembersData] = useState([]);
   const [todayProblems, setTodayProblems] = useState([]);
   const [error, setError] = useState(null);
-  const [totalElements, setTotalElements] = useState(0);
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(10);
-  const [sort, setSort] = useState('desc');
-  const [isFetching, setIsFetching] = useState(false); // 요청 상태 관리
+  const [chatMessages, setChatMessages] = useState([]); // 채팅 메시지 상태
+  const [newMessage, setNewMessage] = useState(''); // 새 메시지 상태
+  const [stompClient, setStompClient] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsFetching(true); // 요청 시작
       try {
         await fetchGroupDetails();
-        await fetchMembers();
         await fetchTodayProblems();
       } catch (err) {
         setError(err.message);
-        // 여기서 토큰 재발급 로직 추가 가능
-      } finally {
-        setIsFetching(false); // 요청 종료
       }
     };
 
     fetchData();
-  }, [groupId, navigate, location, page, size, sort]);
+  }, [groupId, navigate, location]);
+
+  useEffect(() => {
+    const client = new Client({
+      brokerURL: 'ws://localhost:8080/ws',
+      connectHeaders: {
+        access: localStorage.getItem('access') || '',
+      },
+      debug: (str) => {
+        console.log(str);
+      },
+      onConnect: () => {
+        console.log('Connected to WebSocket');
+        client.subscribe(`/sub/channel/${groupId}`, (message) => {
+          try {
+            const msg = JSON.parse(message.body); // JSON 형식으로 파싱
+            setChatMessages((prev) => [...prev, msg]);
+          } catch (error) {
+            console.error('Error parsing message:', error);
+            console.log('Received message:', message.body); // 수신된 메시지 출력
+          }
+        });
+      },
+      onStompError: (frame) => {
+        console.error('Broker reported error: ' + frame.headers['message']);
+        console.error('Error details:', frame.body);
+      },
+    });
+
+    setStompClient(client); // STOMP 클라이언트 상태 업데이트
+    client.activate();
+
+    return () => {
+      client.deactivate();
+    };
+  }, [groupId]);
 
   const fetchGroupDetails = async () => {
     const url = `http://localhost:8080/groups/${groupId}`;
@@ -43,19 +71,6 @@ const UserGroupDetailWithMembersForm = () => {
     } else {
       throw new Error(
         response.message || '그룹 정보를 불러오는 데 실패했습니다.'
-      );
-    }
-  };
-
-  const fetchMembers = async () => {
-    const url = `http://localhost:8080/usergroups/${groupId}/users?page=${page}&size=${size}&sort=${sort}`;
-    const response = await FetchAuthorizedPage(url, navigate, location);
-    if (response && response.isSuccess) {
-      setMembersData(response.result.usernameDtos);
-      setTotalElements(response.result.totalElements);
-    } else {
-      throw new Error(
-        response.message || '멤버 정보를 불러오는 데 실패했습니다.'
       );
     }
   };
@@ -72,7 +87,23 @@ const UserGroupDetailWithMembersForm = () => {
     }
   };
 
-  const totalPages = Math.ceil(totalElements / size);
+  const sendMessage = () => {
+    if (newMessage.trim() && stompClient) {
+      const message = {
+        type: 'CHAT',
+        sender: localStorage.getItem('name'), // 실제 사용자 이름으로 변경
+        channelId: groupId,
+        data: newMessage,
+      };
+
+      stompClient.publish({
+        destination: `/pub/hello`, // 메시지를 전송할 엔드포인트
+        body: JSON.stringify(message), // JSON 형식으로 변환하여 전송
+      });
+
+      setNewMessage(''); // 메시지 입력 필드 초기화
+    }
+  };
 
   return (
     <div style={{ display: 'flex' }}>
@@ -146,6 +177,7 @@ const UserGroupDetailWithMembersForm = () => {
             )}
           </div>
 
+          {/* 채팅 부분 */}
           <div
             style={{
               flex: 1,
@@ -153,76 +185,42 @@ const UserGroupDetailWithMembersForm = () => {
               textAlign: 'center',
             }}
           >
-            {membersData.length > 0 ? (
-              <>
-                <h2>그룹 멤버 목록</h2>
-                <table
-                  style={{
-                    marginTop: '20px',
-                    borderCollapse: 'collapse',
-                    width: '80%',
-                    margin: '0 auto',
-                  }}
-                >
-                  <thead>
-                    <tr>
-                      <th style={{ border: '1px solid #ccc', padding: '10px' }}>
-                        회원 이름
-                      </th>
-                      <th style={{ border: '1px solid #ccc', padding: '10px' }}>
-                        예치금
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {membersData.map((member, index) => (
-                      <tr key={index}>
-                        <td
-                          style={{ border: '1px solid #ccc', padding: '10px' }}
-                        >
-                          {member.username}
-                        </td>
-                        <td
-                          style={{ border: '1px solid #ccc', padding: '10px' }}
-                        >
-                          {member.depositAmount.toLocaleString()} 원
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                <div
-                  style={{
-                    marginTop: '20px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <button
-                    onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
-                    disabled={page === 0}
-                    style={{ marginRight: '10px' }}
-                  >
-                    이전
-                  </button>
-                  <span>
-                    페이지 {page + 1} / {totalPages}
-                  </span>
-                  <button
-                    onClick={() =>
-                      setPage((prev) => Math.min(prev + 1, totalPages - 1))
-                    }
-                    disabled={page >= totalPages - 1}
-                    style={{ marginLeft: '10px' }}
-                  >
-                    다음
-                  </button>
+            <h2>채팅</h2>
+            <div
+              style={{
+                border: '1px solid #ccc',
+                borderRadius: '5px',
+                padding: '10px',
+                height: '300px',
+                overflowY: 'scroll',
+                marginBottom: '20px',
+              }}
+            >
+              {chatMessages.map((msg, index) => (
+                <div key={index} style={{ marginBottom: '10px' }}>
+                  <strong>{msg.sender}:</strong> {msg.data}
                 </div>
-              </>
-            ) : (
-              <div>멤버 정보가 없습니다.</div>
-            )}
+              ))}
+            </div>
+
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="메시지를 입력하세요..."
+              style={{
+                width: '80%',
+                padding: '10px',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+              }}
+            />
+            <button
+              onClick={sendMessage}
+              style={{ padding: '10px', marginLeft: '10px' }}
+            >
+              전송
+            </button>
           </div>
         </div>
       </div>
