@@ -3,6 +3,7 @@ import { Client } from '@stomp/stompjs';
 import UsergroupNavBar from '../../components/UsergroupNavBar';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import FetchAuthorizedPage from '../../service/FetchAuthorizedPage';
+import FetchReissue from '../../service/FetchReissue';
 
 const UserGroupDetailWithMembersForm = () => {
   const { groupId } = useParams();
@@ -11,8 +12,8 @@ const UserGroupDetailWithMembersForm = () => {
   const [groupData, setGroupData] = useState(null);
   const [todayProblems, setTodayProblems] = useState([]);
   const [error, setError] = useState(null);
-  const [chatMessages, setChatMessages] = useState([]); // 채팅 메시지 상태
-  const [newMessage, setNewMessage] = useState(''); // 새 메시지 상태
+  const [chatMessages, setChatMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
   const [stompClient, setStompClient] = useState(null);
 
   useEffect(() => {
@@ -28,7 +29,7 @@ const UserGroupDetailWithMembersForm = () => {
     fetchData();
   }, [groupId, navigate, location]);
 
-  useEffect(() => {
+  const connectWebSocket = async () => {
     const client = new Client({
       brokerURL: 'ws://localhost:8080/ws',
       connectHeaders: {
@@ -41,25 +42,41 @@ const UserGroupDetailWithMembersForm = () => {
         console.log('Connected to WebSocket');
         client.subscribe(`/sub/channel/${groupId}`, (message) => {
           try {
-            const msg = JSON.parse(message.body); // JSON 형식으로 파싱
-            setChatMessages((prev) => [...prev, msg]);
+            const msg = JSON.parse(message.body);
+            // 현재 시간을 createdAt에 추가
+            const timestamp = new Date(); // 현재 시간
+            setChatMessages((prev) => [
+              ...prev,
+              { ...msg, createdAt: timestamp },
+            ]); // 메시지에 시간 추가
           } catch (error) {
             console.error('Error parsing message:', error);
-            console.log('Received message:', message.body); // 수신된 메시지 출력
+            console.log('Received message:', message.body);
           }
         });
       },
-      onStompError: (frame) => {
+      onStompError: async (frame) => {
         console.error('Broker reported error: ' + frame.headers['message']);
         console.error('Error details:', frame.body);
+
+        setChatMessages((prev) => [
+          ...prev,
+          { sender: 'System', data: '소켓 연결이 안되면 새로고침해주세요.' },
+        ]);
       },
     });
 
-    setStompClient(client); // STOMP 클라이언트 상태 업데이트
+    setStompClient(client);
     client.activate();
+  };
+
+  useEffect(() => {
+    connectWebSocket();
 
     return () => {
-      client.deactivate();
+      if (stompClient) {
+        stompClient.deactivate();
+      }
     };
   }, [groupId]);
 
@@ -91,17 +108,17 @@ const UserGroupDetailWithMembersForm = () => {
     if (newMessage.trim() && stompClient) {
       const message = {
         type: 'CHAT',
-        sender: localStorage.getItem('name'), // 실제 사용자 이름으로 변경
+        sender: localStorage.getItem('name'),
         channelId: groupId,
         data: newMessage,
       };
 
       stompClient.publish({
-        destination: `/pub/hello`, // 메시지를 전송할 엔드포인트
-        body: JSON.stringify(message), // JSON 형식으로 변환하여 전송
+        destination: `/pub/hello`,
+        body: JSON.stringify(message),
       });
 
-      setNewMessage(''); // 메시지 입력 필드 초기화
+      setNewMessage('');
     }
   };
 
@@ -199,6 +216,10 @@ const UserGroupDetailWithMembersForm = () => {
               {chatMessages.map((msg, index) => (
                 <div key={index} style={{ marginBottom: '10px' }}>
                   <strong>{msg.sender}:</strong> {msg.data}
+                  <span style={{ fontSize: 'small', color: 'gray' }}>
+                    ({new Date(msg.createdAt).toLocaleTimeString()}){' '}
+                    {/* createdAt 사용 */}
+                  </span>
                 </div>
               ))}
             </div>
