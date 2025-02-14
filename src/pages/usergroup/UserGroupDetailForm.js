@@ -51,7 +51,7 @@ const UserGroupDetailWithMembersForm = () => {
       },
       onConnect: () => {
         console.log('Connected to WebSocket');
-        client.subscribe(`/sub/channel/${groupId}`, (message) => {
+        client.subscribe(`/topic/${groupId}`, (message) => {
           try {
             const msg = JSON.parse(message.body);
             // 현재 시간을 createdAt에 추가
