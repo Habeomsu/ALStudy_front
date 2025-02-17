@@ -41,17 +41,25 @@ const UserGroupDetailWithMembersForm = () => {
     fetchData();
   }, [groupId, navigate, location]);
 
+  let isWebSocketConnected = false; // WebSocket 연결 상태 추적 변수
+
   const connectWebSocket = async () => {
+    // WebSocket이 이미 연결되었으면 추가 연결 시도를 하지 않음
+    if (isWebSocketConnected) {
+      console.log('Already connected to WebSocket');
+      return;
+    }
+
     const client = new Client({
       brokerURL: 'ws://localhost:8080/ws',
       connectHeaders: {
         access: localStorage.getItem('access') || '',
       },
-      debug: (str) => {
-        console.log(str);
-      },
+
       onConnect: () => {
         console.log('Connected to WebSocket');
+        isWebSocketConnected = true; // 연결됨 상태로 표시
+
         client.subscribe(`/topic/${groupId}`, (message) => {
           try {
             const msg = JSON.parse(message.body);
@@ -69,14 +77,18 @@ const UserGroupDetailWithMembersForm = () => {
           }
         });
       },
-      onStompError: async (frame) => {
-        console.error('Broker reported error: ' + frame.headers['message']);
-        console.error('Error details:', frame.body);
 
-        setChatMessages((prev) => [
-          ...prev,
-          { sender: 'System', data: '소켓 연결이 안되면 새로고침해주세요.' },
-        ]);
+      onStompError: async (frame) => {
+        if (!isWebSocketConnected) {
+          console.error('Broker reported error: ' + frame.headers['message']);
+          console.error('Error details:', frame.body); // 연결 끊어짐에 대한 더 자세한 정보 확인
+
+          // 채팅 메시지에 오류 표시 추가 (단, 이미 연결된 경우에는 표시하지 않음)
+          setChatMessages((prev) => [
+            ...prev,
+            { sender: 'System', data: '소켓 연결이 안되면 새로고침해주세요.' },
+          ]);
+        }
       },
     });
 
@@ -92,7 +104,7 @@ const UserGroupDetailWithMembersForm = () => {
         stompClient.deactivate();
       }
     };
-  }, [groupId]);
+  }, []);
 
   const fetchGroupDetails = async () => {
     const url = `http://localhost:8080/groups/${groupId}`;
