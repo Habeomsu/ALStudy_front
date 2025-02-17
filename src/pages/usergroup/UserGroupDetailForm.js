@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Client } from '@stomp/stompjs';
 import UsergroupNavBar from '../../components/UsergroupNavBar';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -15,14 +15,15 @@ const UserGroupDetailWithMembersForm = () => {
   const [chatMessages, setChatMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [stompClient, setStompClient] = useState(null);
-  const [page, setPage] = useState(0); // 현재 페이지 상태
-  const [loading, setLoading] = useState(false); // 로딩 상태
-  const [isFirstLoad, setIsFirstLoad] = useState(true); // 첫 로드 여부
 
+  const [loading, setLoading] = useState(false); // 로딩 상태
+  const [page, setPage] = useState(0); // 현재 페이지 상태
+  const chatContainerRef = useRef(null);
+  const [hasMore, setHasMore] = useState(true);
   const scrollToBottom = () => {
-    const chatContainer = document.getElementById('chat-container');
-    if (chatContainer) {
-      chatContainer.scrollTop = chatContainer.scrollHeight; // 스크롤을 아래로 이동
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
   };
 
@@ -136,49 +137,76 @@ const UserGroupDetailWithMembersForm = () => {
   };
 
   const fetchPreviousMessages = async () => {
-    if (loading) return; // 이미 로딩 중이면 중복 호출 방지
-    setLoading(true); // 로딩 시작
-    const url = `http://localhost:8080/message/${groupId}?page=${page}&size=20`; // API 호출
+    if (loading || !hasMore) return;
+    setLoading(true);
+
+    const chatContainer = chatContainerRef.current;
+    const previousScrollHeight = chatContainer ? chatContainer.scrollHeight : 0;
+
+    const url = `http://localhost:8080/message/${groupId}?page=${page}&size=20`;
     const response = await FetchAuthorizedPage(url, navigate, location);
+
     if (response && response.isSuccess) {
-      // 불러온 메시지를 기존 메시지 위에 추가 (위쪽에 위치)
-      setChatMessages((prev) => [
-        ...response.result.messageResDtos.reverse(),
-        ...prev,
-      ]);
+      const newMessages = response.result.messageResDtos.reverse();
 
-      // 현재 스크롤 위치를 저장
-      const chatContainer = document.getElementById('chat-container');
-      const previousScrollHeight = chatContainer.scrollHeight; // 이전 스크롤 높이
-
-      if (isFirstLoad && response.result.messageResDtos.length > 0) {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-        setIsFirstLoad(false); // 첫 로딩 후 상태 변경
-      } else {
-        // 메시지 수가 20개 미만일 경우 스크롤 위치 유지
-        if (response.result.messageResDtos.length < 20) {
-          chatContainer.scrollTop =
-            previousScrollHeight - chatContainer.scrollHeight; // 위치 조정
-        } else {
-          chatContainer.scrollTop = previousScrollHeight; // 스크롤을 아래로 이동
-        }
+      if (newMessages.length > 0) {
+        setChatMessages((prev) => [...newMessages, ...prev]);
       }
 
-      setPage((prev) => prev + 1); // 페이지 증가
+      if (response.result.last) {
+        setHasMore(false);
+      }
+
+      // 🔹 추가 메시지를 불러온 후, 이전 스크롤 위치 유지
+      setTimeout(() => {
+        if (chatContainer) {
+          chatContainer.scrollTop =
+            chatContainer.scrollHeight - previousScrollHeight;
+        }
+      }, 100);
     } else {
-      throw new Error(
+      console.error(
         response.message || '이전 메시지를 불러오는 데 실패했습니다.'
       );
     }
-    setLoading(false); // 로딩 종료
+
+    setLoading(false);
   };
 
-  // const scrollToTop = () => {
-  //   const chatContainer = document.getElementById('chat-container');
-  //   if (chatContainer) {
-  //     chatContainer.scrollTop = 0; // 스크롤을 맨 위로 이동
-  //   }
-  // };
+  // 처음 채팅방에 들어올 때만 실행
+  useEffect(() => {
+    if (chatMessages.length > 0 && page === 0) {
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    }
+  }, [chatMessages, page]);
+
+  useEffect(() => {
+    if (page > 0 && hasMore) {
+      fetchPreviousMessages();
+    }
+  }, [page]);
+
+  const onScroll = () => {
+    if (!hasMore) return;
+    const chatContainer = chatContainerRef.current;
+    if (chatContainer.scrollTop === 0) {
+      setPage((prev) => prev + 1);
+    }
+  };
+
+  useEffect(() => {
+    const chatContainer = chatContainerRef.current;
+    if (chatContainer) {
+      chatContainer.addEventListener('scroll', onScroll);
+    }
+    return () => {
+      if (chatContainer) {
+        chatContainer.removeEventListener('scroll', onScroll);
+      }
+    };
+  }, []);
 
   return (
     <div style={{ display: 'flex' }}>
@@ -262,7 +290,7 @@ const UserGroupDetailWithMembersForm = () => {
           >
             <h2>채팅</h2>
             <div
-              id="chat-container"
+              ref={chatContainerRef}
               style={{
                 border: '1px solid #ccc',
                 borderRadius: '5px',
@@ -271,7 +299,7 @@ const UserGroupDetailWithMembersForm = () => {
                 overflowY: 'scroll',
                 marginBottom: '20px',
                 display: 'flex',
-                flexDirection: 'column', // 기본 방향 설정
+                flexDirection: 'column',
               }}
             >
               {/* 기존 메시지를 순서대로 표시 */}
@@ -318,14 +346,6 @@ const UserGroupDetailWithMembersForm = () => {
               style={{ padding: '10px', marginLeft: '10px' }}
             >
               전송
-            </button>
-
-            {/* 이전 대화 불러오기 버튼 추가 */}
-            <button
-              onClick={fetchPreviousMessages}
-              style={{ padding: '10px', marginTop: '10px' }}
-            >
-              이전 대화 불러오기
             </button>
           </div>
         </div>
