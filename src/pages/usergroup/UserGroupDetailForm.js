@@ -4,6 +4,7 @@ import UsergroupNavBar from '../../components/UsergroupNavBar';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import FetchAuthorizedPage from '../../service/FetchAuthorizedPage';
 import FetchReissue from '../../service/FetchReissue';
+import { Cookies } from 'react-cookie';
 
 const UserGroupDetailWithMembersForm = () => {
   const { groupId } = useParams();
@@ -33,32 +34,36 @@ const UserGroupDetailWithMembersForm = () => {
         await fetchGroupDetails();
         await fetchTodayProblems();
         await fetchPreviousMessages();
+        connectWebSocket();
       } catch (err) {
         setError(err.message);
       }
     };
 
     fetchData();
+    return () => {
+      if (stompClient) {
+        stompClient.deactivate(); // 컴포넌트 언마운트 시 WebSocket 연결 종료
+      }
+    };
   }, [groupId, navigate, location]);
 
-  let isWebSocketConnected = false; // WebSocket 연결 상태 추적 변수
-
   const connectWebSocket = async () => {
-    // WebSocket이 이미 연결되었으면 추가 연결 시도를 하지 않음
-    if (isWebSocketConnected) {
-      console.log('Already connected to WebSocket');
-      return;
+    if (stompClient) {
+      // 기존 연결이 있으면 끊기
+      stompClient.deactivate();
+      console.log('Disconnected from previous WebSocket connection');
     }
-
     const client = new Client({
       brokerURL: 'ws://localhost:8080/ws',
       connectHeaders: {
         access: localStorage.getItem('access') || '',
       },
+      heartbeatIncoming: 30000,
+      heartbeatOutgoing: 30000,
 
       onConnect: () => {
         console.log('Connected to WebSocket');
-        isWebSocketConnected = true; // 연결됨 상태로 표시
 
         client.subscribe(`/topic/${groupId}`, (message) => {
           try {
@@ -79,16 +84,14 @@ const UserGroupDetailWithMembersForm = () => {
       },
 
       onStompError: async (frame) => {
-        if (!isWebSocketConnected) {
-          console.error('Broker reported error: ' + frame.headers['message']);
-          console.error('Error details:', frame.body); // 연결 끊어짐에 대한 더 자세한 정보 확인
+        console.error('WebSocket Error:', frame.headers['message']);
+        console.error('Error details:', frame.body);
+        console.log('frame:', frame);
 
-          // 채팅 메시지에 오류 표시 추가 (단, 이미 연결된 경우에는 표시하지 않음)
-          setChatMessages((prev) => [
-            ...prev,
-            { sender: 'System', data: '소켓 연결이 안되면 새로고침해주세요.' },
-          ]);
-        }
+        setChatMessages((prev) => [
+          ...prev,
+          { sender: 'System', data: '토큰 만료 !! 새로고침해주세요' },
+        ]);
       },
     });
 
@@ -96,21 +99,12 @@ const UserGroupDetailWithMembersForm = () => {
     client.activate();
   };
 
-  useEffect(() => {
-    connectWebSocket();
-
-    return () => {
-      if (stompClient) {
-        stompClient.deactivate();
-      }
-    };
-  }, []);
-
   const fetchGroupDetails = async () => {
     const url = `http://localhost:8080/groups/${groupId}`;
     const response = await FetchAuthorizedPage(url, navigate, location);
     if (response && response.isSuccess) {
       setGroupData(response.result);
+      console.log('fetchGroupDetails is success');
     } else {
       throw new Error(
         response.message || '그룹 정보를 불러오는 데 실패했습니다.'
@@ -123,6 +117,7 @@ const UserGroupDetailWithMembersForm = () => {
     const response = await FetchAuthorizedPage(url, navigate, location);
     if (response && response.isSuccess) {
       setTodayProblems(response.result.groupProblemResDtos);
+      console.log('setTodayProblems is success');
     } else {
       throw new Error(
         response.message || '오늘의 문제를 불러오는 데 실패했습니다.'
@@ -160,6 +155,7 @@ const UserGroupDetailWithMembersForm = () => {
 
     if (response && response.isSuccess) {
       const newMessages = response.result.messageResDtos.reverse();
+      console.log('fetchPreviousMessages is success');
 
       if (newMessages.length > 0) {
         setChatMessages((prev) => [...newMessages, ...prev]);
