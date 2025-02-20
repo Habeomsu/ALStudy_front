@@ -1,71 +1,55 @@
-# Getting Started with Create React App
+# 프로젝트명 (예:Algorithm Study Backend(알쓰))
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 📝 소개
+이 프로젝트는 알고리즘 스터디를 위한 프론트앤드입니다.  
+사용자들은 그룹을 생성하여 알고리즘 문제를 함께 해결하고,  
+자신의 코드와 그룹원들의 코드를 비교하며 알고리즘 실력을 향상시킬 수 있습니다.
 
-## Available Scripts
+## 🔍 프로젝트 특징
+### 1. 자동화된 JWT 토큰 재발급
+모든 API 요청 시 토큰이 만료되면 자동으로 새로운 JWT 토큰이 재발급됩니다.  
+이 기능 덕분에 사용자는 실제 요청이 실패하더라도 요청이 성공한 것처럼 확인할 수 있어 사용자 경험이 향상됩니다.
+## 🚀 주요 기능
+### 1. 그룹 관리  
+- 사용자는 **스터디 그룹을 생성**하고, 비밀번호를 입력해 가입이 가능합니다.  
+- 그룹장은 **문제 생성** 및 **그룹 설정 변경**이 가능합니다.
+- 관련 링크  
+  
+### 2. 문제 풀이 및 채점  
+- 사용자는 그룹 내에서 **알고리즘 문제를 제출 및 풀이**할 수 있습니다.  
+- 코드 실행 및 채점을 통해 정답 여부를 확인할 수 있으며, 그룹원들의 코드와 비교할 수도 있습니다.  
+- 관련 링크
+- 
+### 3. 그룹 채팅 및 소통  
+- 그룹별 **실시간 채팅 기능**을 제공하여, 문제 풀이 관련 논의 및 스터디 진행이 가능합니다.  
+- 특정 코드나 문제에 대한 의견을 공유할 수도 있습니다.  
+- 관련 링크
+- 
+### 4. 예치금 충전 및 환급  
+- 사용자들은 서비스 이용을 위해 **예치금을 충전**할 수 있으며, **사용 후 남은 금액을 환급**받을 수도 있습니다.  
+- 결제 및 환불 시스템을 통해 안전하게 거래가 진행됩니다.  
+- 관련 링크
+- 
+### 5. 사용자 인증 (로그인/로그아웃)  
+- 로그인한 사용자만 그룹 생성 및 가입, 문제 풀이 등의 기능을 사용할 수 있습니다.  
+- JWT를 사용하여 보안을 강화합니다.
 
-In the project directory, you can run:
+## 🏗️ 프로젝트 구조
+```
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```
+## ⚙️ 기술 스택
+- **Backend**: Spring Boot, Java, Spring MVC, Spring Data JPA, Flask
+- **STOMP**: RabbitMQ  
+- **Database**: MySQL
+- **API**: Flask API, TOSS_PAYMENTS API  
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
+## 📖 API 문서
+추후 스웨거 문서 사용
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🛠️ 배포
+여러가지 배포 과정을 사용
+배포관련 레포지 토리 연결 
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-# ALStudy_front
