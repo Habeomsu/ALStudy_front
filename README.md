@@ -13,23 +13,20 @@
 ### 1. 그룹 관리  
 - 사용자는 **스터디 그룹을 생성**하고, 비밀번호를 입력해 가입이 가능합니다.  
 - 그룹장은 **문제 생성** 및 **그룹 설정 변경**이 가능합니다.
-- 관련 링크  
+
   
 ### 2. 문제 풀이 및 채점  
 - 사용자는 그룹 내에서 **알고리즘 문제를 제출 및 풀이**할 수 있습니다.  
 - 코드 실행 및 채점을 통해 정답 여부를 확인할 수 있으며, 그룹원들의 코드와 비교할 수도 있습니다.  
-- 관련 링크
-- 
+
 ### 3. 그룹 채팅 및 소통  
 - 그룹별 **실시간 채팅 기능**을 제공하여, 문제 풀이 관련 논의 및 스터디 진행이 가능합니다.  
 - 특정 코드나 문제에 대한 의견을 공유할 수도 있습니다.  
-- 관련 링크
-- 
+
 ### 4. 예치금 충전 및 환급  
 - 사용자들은 서비스 이용을 위해 **예치금을 충전**할 수 있으며, **사용 후 남은 금액을 환급**받을 수도 있습니다.  
 - 결제 및 환불 시스템을 통해 안전하게 거래가 진행됩니다.  
-- 관련 링크
-- 
+
 ### 5. 사용자 인증 (로그인/로그아웃)  
 - 로그인한 사용자만 그룹 생성 및 가입, 문제 풀이 등의 기능을 사용할 수 있습니다.  
 - JWT를 사용하여 보안을 강화합니다.
@@ -38,81 +35,28 @@
 ```
 📦 src
  ┣ 📂 components
- ┃ ┣ 📜 GroupProblemButton.js
- ┃ ┣ 📜 Header.js
- ┃ ┗ 📜 UsergroupNavBar.js
  ┣ 📂 contexts
- ┃ ┗ 📜 AuthContext.js
  ┣ 📂 pages
  ┃ ┣ 📂 auth
  ┃ ┃ ┣ 📜 JoinForm.js
  ┃ ┃ ┣ 📜 LoginForm.js
  ┃ ┃ ┗ 📜 LogoutForm.js
  ┃ ┣ 📂 group
- ┃ ┃ ┣ 📜 CreateGroupForm.js
- ┃ ┃ ┣ 📜 GroupDetailForm.js
- ┃ ┃ ┗ 📜 GroupsForm.js
  ┃ ┣ 📂 groupProblem
- ┃ ┃ ┣ 📜 CreateGroupProblemForm.js
- ┃ ┃ ┣ 📜 GroupProblemDetailForm.js
- ┃ ┃ ┣ 📜 GroupProblemForm.js
- ┃ ┃ ┗ 📜 UpdateGroupProblemForm.js
  ┃ ┣ 📂 payment
- ┃ ┃ ┣ 📜 CheckOutForm.js
- ┃ ┃ ┣ 📜 FailForm.js
- ┃ ┃ ┣ 📜 GroupCheckOutForm.js
- ┃ ┃ ┣ 📜 GroupFailForm.js
- ┃ ┃ ┣ 📜 GroupSuccessForm.js
- ┃ ┃ ┣ 📜 PaymentStyle.css
- ┃ ┃ ┗ 📜 SuccessForm.js
  ┃ ┣ 📂 problem
- ┃ ┃ ┣ 📜 CreateProblemForm.js
- ┃ ┃ ┣ 📜 ProblemsDetailForm.js
- ┃ ┃ ┣ 📜 ProblemsForm.js
- ┃ ┃ ┗ 📜 UpdateProblemForm.js
  ┃ ┣ 📂 submit
- ┃ ┃ ┣ 📜 MySubmitDetailForm.js
- ┃ ┃ ┣ 📜 MySubmitForm.js
- ┃ ┃ ┣ 📜 OtherSubmitDetailForm.js
- ┃ ┃ ┣ 📜 OtherSubmitForm.js
- ┃ ┃ ┗ 📜 SubmitForm.js
  ┃ ┣ 📂 testcase
- ┃ ┃ ┣ 📜 CreateTestCaseForm.js
- ┃ ┃ ┗ 📜 UpdateTestCaseForm.js
  ┃ ┣ 📂 usergroup
- ┃ ┃ ┣ 📜 UserGroupDetailForm.js
- ┃ ┃ ┣ 📜 UserGroupForm.js
- ┃ ┃ ┗ 📜 UserGroupMemberForm.js
  ┃ ┗ 📜 HomeForm.js
  ┣ 📂 routes
- ┃ ┗ 📜 MyRoute.js
  ┣ 📂 service
- ┃ ┣ 📂 group
- ┃ ┃ ┗ 📜 fetchGroups.js
- ┃ ┣ 📂 problem
- ┃ ┃ ┣ 📜 GetProblemDetail.js
- ┃ ┃ ┗ 📜 GetProblems.js
- ┃ ┣ 📜 FetchAuthorizedPage.js
- ┃ ┣ 📜 FetchMultipartAuthorizedPage.js
- ┃ ┗ 📜 FetchReissue.js
  ┣ 📂 style
- ┃ ┗ 📜 problem.js
  ┣ 📜 App.js
  ┗ 📜 index.js
 
-
 ```
 ## ⚙️ 기술 스택
-- **Backend**: Spring Boot, Java, Spring MVC, Spring Data JPA, Flask
-- **STOMP**: RabbitMQ  
-- **Database**: MySQL
-- **API**: Flask API, TOSS_PAYMENTS API  
+- **FRONTEND**: React
 
-
-## 📖 API 문서
-추후 스웨거 문서 사용
-
-## 🛠️ 배포
-여러가지 배포 과정을 사용
-배포관련 레포지 토리 연결 
 
