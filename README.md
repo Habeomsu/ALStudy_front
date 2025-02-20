@@ -36,6 +36,69 @@
 
 ## 🏗️ 프로젝트 구조
 ```
+📦 src
+ ┣ 📂 components
+ ┃ ┣ 📜 GroupProblemButton.js
+ ┃ ┣ 📜 Header.js
+ ┃ ┗ 📜 UsergroupNavBar.js
+ ┣ 📂 contexts
+ ┃ ┗ 📜 AuthContext.js
+ ┣ 📂 pages
+ ┃ ┣ 📂 auth
+ ┃ ┃ ┣ 📜 JoinForm.js
+ ┃ ┃ ┣ 📜 LoginForm.js
+ ┃ ┃ ┗ 📜 LogoutForm.js
+ ┃ ┣ 📂 group
+ ┃ ┃ ┣ 📜 CreateGroupForm.js
+ ┃ ┃ ┣ 📜 GroupDetailForm.js
+ ┃ ┃ ┗ 📜 GroupsForm.js
+ ┃ ┣ 📂 groupProblem
+ ┃ ┃ ┣ 📜 CreateGroupProblemForm.js
+ ┃ ┃ ┣ 📜 GroupProblemDetailForm.js
+ ┃ ┃ ┣ 📜 GroupProblemForm.js
+ ┃ ┃ ┗ 📜 UpdateGroupProblemForm.js
+ ┃ ┣ 📂 payment
+ ┃ ┃ ┣ 📜 CheckOutForm.js
+ ┃ ┃ ┣ 📜 FailForm.js
+ ┃ ┃ ┣ 📜 GroupCheckOutForm.js
+ ┃ ┃ ┣ 📜 GroupFailForm.js
+ ┃ ┃ ┣ 📜 GroupSuccessForm.js
+ ┃ ┃ ┣ 📜 PaymentStyle.css
+ ┃ ┃ ┗ 📜 SuccessForm.js
+ ┃ ┣ 📂 problem
+ ┃ ┃ ┣ 📜 CreateProblemForm.js
+ ┃ ┃ ┣ 📜 ProblemsDetailForm.js
+ ┃ ┃ ┣ 📜 ProblemsForm.js
+ ┃ ┃ ┗ 📜 UpdateProblemForm.js
+ ┃ ┣ 📂 submit
+ ┃ ┃ ┣ 📜 MySubmitDetailForm.js
+ ┃ ┃ ┣ 📜 MySubmitForm.js
+ ┃ ┃ ┣ 📜 OtherSubmitDetailForm.js
+ ┃ ┃ ┣ 📜 OtherSubmitForm.js
+ ┃ ┃ ┗ 📜 SubmitForm.js
+ ┃ ┣ 📂 testcase
+ ┃ ┃ ┣ 📜 CreateTestCaseForm.js
+ ┃ ┃ ┗ 📜 UpdateTestCaseForm.js
+ ┃ ┣ 📂 usergroup
+ ┃ ┃ ┣ 📜 UserGroupDetailForm.js
+ ┃ ┃ ┣ 📜 UserGroupForm.js
+ ┃ ┃ ┗ 📜 UserGroupMemberForm.js
+ ┃ ┗ 📜 HomeForm.js
+ ┣ 📂 routes
+ ┃ ┗ 📜 MyRoute.js
+ ┣ 📂 service
+ ┃ ┣ 📂 group
+ ┃ ┃ ┗ 📜 fetchGroups.js
+ ┃ ┣ 📂 problem
+ ┃ ┃ ┣ 📜 GetProblemDetail.js
+ ┃ ┃ ┗ 📜 GetProblems.js
+ ┃ ┣ 📜 FetchAuthorizedPage.js
+ ┃ ┣ 📜 FetchMultipartAuthorizedPage.js
+ ┃ ┗ 📜 FetchReissue.js
+ ┣ 📂 style
+ ┃ ┗ 📜 problem.js
+ ┣ 📜 App.js
+ ┗ 📜 index.js
 
 
 ```
